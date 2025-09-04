@@ -50,6 +50,8 @@ public class Grid : MonoBehaviour
                     Quaternion.identity
                 );
                 background.transform.parent = transform;
+                
+                background.GetComponent<RectTransform>().anchoredPosition = new Vector3((x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2), (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2), 0f);
 
                 // אם צריך להבטיח גודל תא (במיוחד אם ה-PPU לא תואם):
                 // background.transform.localScale = new Vector3(cellSize, cellSize, 1f);
@@ -69,6 +71,8 @@ public class Grid : MonoBehaviour
                 GameObject go = Instantiate(prefab, new Vector3(x, y, -0.1f), Quaternion.identity);
                 go.name = $"Piece({x},{y})";
                 go.transform.parent = transform;
+                
+                go.GetComponent<RectTransform>().anchoredPosition = new Vector3((x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2), (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2), 0f);
 
                 // אם צריך להבטיח גודל תא:
                 // go.transform.localScale = new Vector3(cellSize, cellSize, 1f);
