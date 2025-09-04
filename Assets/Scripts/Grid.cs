@@ -52,9 +52,7 @@ public class Grid : MonoBehaviour
                 background.transform.parent = transform;
                 
                 background.GetComponent<RectTransform>().anchoredPosition = new Vector3((x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2), (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2), 0f);
-
-                // אם צריך להבטיח גודל תא (במיוחד אם ה-PPU לא תואם):
-                // background.transform.localScale = new Vector3(cellSize, cellSize, 1f);
+                
             }
         }
 
@@ -73,9 +71,6 @@ public class Grid : MonoBehaviour
                 go.transform.parent = transform;
                 
                 go.GetComponent<RectTransform>().anchoredPosition = new Vector3((x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2), (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2), 0f);
-
-                // אם צריך להבטיח גודל תא:
-                // go.transform.localScale = new Vector3(cellSize, cellSize, 1f);
 
                 pieces[x, y] = go;
             }
