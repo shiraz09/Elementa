@@ -3,33 +3,34 @@ using System.Collections.Generic;
 
 public class Grid : MonoBehaviour
 {
-    public enum PieceType
-    {
-        WATER,
-        SUN,
-        EARTH,
-        GRASS
-    };
+    // Types of pieces
+    public enum PieceType { WATER, SUN, EARTH, GRASS };
 
+    // Pair each type with its prefab
     [System.Serializable]
     public struct PiecePrefab
     {
-        public PieceType type;     // סוג החתיכה
-        public GameObject prefab;  // הפריפאב של החתיכה
+        public PieceType type;     // piece type
+        public GameObject prefab;  // prefab to spawn
     };
 
-    public int xDim = 8;                          // רוחב הלוח (מספר עמודות)
-    public int yDim = 8;                          // גובה הלוח (מספר שורות)
-    public float cellSize = 1f;                   // גודל תא (אם תרצי להשתמש בהמשך)
-    public PiecePrefab[] piecePrefabs;            // רשימה של סוגים ופריפאבים
-    public GameObject backgroundPrefab;           // פריפאב של משבצת רקע
+    // Board size and cell size
+    public int xDim = 8;    
+    public int yDim = 8;    
+    public float cellSize = 1f;
 
-    private Dictionary<PieceType, GameObject> piecePrefabDict; // מילון: סוג → פריפאב
-    private GameObject[,] pieces;                                 // מטריצה של החתיכות על הלוח
+    // Prefabs for pieces and background
+    public PiecePrefab[] piecePrefabs;
+    public GameObject backgroundPrefab;
+
+    // Dictionary: type → prefab
+    private Dictionary<PieceType, GameObject> piecePrefabDict;
+    // 2D array for placed pieces
+    private GameObject[,] pieces;
 
     void Start()
     {
-        // בונים מילון מהמערך piecePrefabs
+        // Build dictionary from piecePrefabs
         piecePrefabDict = new Dictionary<PieceType, GameObject>();
         for (int i = 0; i < piecePrefabs.Length; i++)
         {
@@ -39,38 +40,50 @@ public class Grid : MonoBehaviour
             }
         }
 
-        // בונים לוח של רקעים
+        // Create background tiles
         for (int x = 0; x < xDim; x++)
         {
             for (int y = 0; y < yDim; y++)
             {
                 GameObject background = Instantiate(
                     backgroundPrefab,
-                    new Vector3(x, y, 0f),
+                    new Vector3(x, y, 0f),   // temporary position
                     Quaternion.identity
                 );
                 background.transform.parent = transform;
-                
-                background.GetComponent<RectTransform>().anchoredPosition = new Vector3((x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2), (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2), 0f);
-                
+
+                // Position background in centered grid
+                background.GetComponent<RectTransform>().anchoredPosition =
+                    new Vector3(
+                        (x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2),
+                        (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2),
+                        0f
+                    );
             }
         }
 
-        // בונים את החתיכות עצמן – רנדומלי מתוך הרשימה
+        // Create random pieces on the board
         pieces = new GameObject[xDim, yDim];
         for (int x = 0; x < xDim; x++)
         {
             for (int y = 0; y < yDim; y++)
             {
-                // בוחרים רשומה רנדומלית מהמערך (בטוח יותר מללהק מספר ל-enum)
+                // Pick random type from list
                 PiecePrefab entry = piecePrefabs[Random.Range(0, piecePrefabs.Length)];
                 GameObject prefab = piecePrefabDict[entry.type];
 
+                // Create piece
                 GameObject go = Instantiate(prefab, new Vector3(x, y, -0.1f), Quaternion.identity);
                 go.name = $"Piece({x},{y})";
                 go.transform.parent = transform;
-                
-                go.GetComponent<RectTransform>().anchoredPosition = new Vector3((x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2), (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2), 0f);
+
+                // Position piece in centered grid
+                go.GetComponent<RectTransform>().anchoredPosition =
+                    new Vector3(
+                        (x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2),
+                        (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2),
+                        0f
+                    );
 
                 pieces[x, y] = go;
             }
