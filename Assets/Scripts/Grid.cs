@@ -15,8 +15,8 @@ public class Grid : MonoBehaviour
     };
 
     // Board size and cell size
-    public int xDim = 8;    
-    public int yDim = 8;    
+    public int xDim = 8;
+    public int yDim = 8;
     public float cellSize = 1f;
 
     // Prefabs for pieces and background
@@ -26,7 +26,7 @@ public class Grid : MonoBehaviour
     // Dictionary: type → prefab
     private Dictionary<PieceType, GameObject> piecePrefabDict;
     // 2D array for placed pieces
-    private GameObject[,] pieces;
+    private GamePiece[,] pieces;
 
     void Start()
     {
@@ -63,7 +63,7 @@ public class Grid : MonoBehaviour
         }
 
         // Create random pieces on the board
-        pieces = new GameObject[xDim, yDim];
+        pieces = new GamePiece[xDim, yDim];
         for (int x = 0; x < xDim; x++)
         {
             for (int y = 0; y < yDim; y++)
@@ -88,5 +88,8 @@ public class Grid : MonoBehaviour
                 pieces[x, y] = go;
             }
         }
+    }
+    public Vector2 GetWorldPosition(int x, int y) {
+       return new Vector2(transform.position.x - xDim / 2.0f + x, transform.position.y + yDim / 2.0f - y);
     }
 }
