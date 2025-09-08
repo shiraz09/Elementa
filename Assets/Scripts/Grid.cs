@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 public class Grid : MonoBehaviour
 {
@@ -93,3 +94,76 @@ public class Grid : MonoBehaviour
        return new Vector2(transform.position.x - xDim / 2.0f + x, transform.position.y + yDim / 2.0f - y);
     }
 }
+
+
+    public enum TargetMode { None,Row, Column, Cell3x3, AllOfType }
+    private TargetMode pendingMode = TargetMode.None;
+    public void EnterTargetMode(TargetMode mode){
+        pendingMode = mode;
+    }
+    public void OnCellClicked(int x, int y, PieceType t)
+    {
+        if (pendingMode == TargetMode.None) return;
+        switch (pendingMode)
+        {
+            case TargetMode.Row:
+                ClearRow(y);
+                break;
+            case TargetMode.Column:
+                ClearColumn(x);
+                break;
+            case TargetMode.Cell3x3:
+                Bomb3x3(x, y);
+                break;
+            case TargetMode.AllOfType:
+                ClearAllOfType(t);
+                break;
+        }
+        pendingMode = TargetMode.None;
+    }
+    public void ClearRow(int y) {
+        if (y < 0 || y >= yDim) return; // Invalid row
+        for (int x = 0; x < xDim; x++)
+        {
+            if (pieces[x, y] != null)
+            {
+                Destroy(pieces[x, y]);
+                pieces[x, y] = null;
+            }
+        }
+    }
+    public void ClearColumn(int x)
+    {
+        if (x < 0 || x >= xDim) return;
+        for (int y = 0; y < yDim; y++)
+        {
+            if (pieces[x, y] != null)
+            {
+                Destroy(pieces[x, y]);
+                pieces[x, y] = null;
+            }
+        }
+    }
+
+    public void ClearAllOfType(PieceType type) {
+        for (int x = 0; x < xDim; x++)
+        {
+            for (int y = 0; y < yDim; y++)
+            {
+                if (pieces[x, y] != null && pieces[x, y].CompareTag(type.ToString()))
+                {
+                    Destroy(pieces[x, y]);
+                    pieces[x, y] = null;
+                }
+            }
+        }
+    }
+    public void Bomb3x3(int centerX, int centerY) {
+        
+    }
+    
+        
+        
+}
+
+    
