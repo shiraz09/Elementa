@@ -86,16 +86,13 @@ public class Grid : MonoBehaviour
                         0f
                     );
 
-                pieces[x, y] = go;
+                pieces[x, y] = go.GetComponent<GamePiece>();
             }
         }
     }
     public Vector2 GetWorldPosition(int x, int y) {
        return new Vector2(transform.position.x - xDim / 2.0f + x, transform.position.y + yDim / 2.0f - y);
     }
-}
-
-
     public enum TargetMode { None,Row, Column, Cell3x3, AllOfType }
     private TargetMode pendingMode = TargetMode.None;
     public void EnterTargetMode(TargetMode mode){

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GamePiece : MonoBehavior{
+public class GamePiece : MonoBehaviour{
     private int x;
     private int y;
     private Grid.PieceType type;

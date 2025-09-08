@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MoveablePiece : MonoBehavior
+public class MoveablePiece : MonoBehaviour
 {
     private GamePiece piece;
 
@@ -12,6 +12,6 @@ public class MoveablePiece : MonoBehavior
     {
         piece.X = newX;
         piece.Y = newY;
-        piece.transform.localPosition = piece.GridRef.getWorldPosition(newX, newY);
+        piece.transform.localPosition = piece.GridRef.GetWorldPosition(newX, newY);
     }
 }
