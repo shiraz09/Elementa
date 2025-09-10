@@ -13,7 +13,7 @@ public class StoreManager : MonoBehaviour
     public TMP_Text titleText, costText, effectText;
     public Button buyButton, closeButton;
     public bool showAsModal = false;
-    public GameObject overlay; 
+    //public GameObject overlay; 
     Transform infoOriginalParent;   // to restore parent on close
     public class FlowerDef
     {
@@ -64,7 +64,7 @@ public class StoreManager : MonoBehaviour
         
         if (closeButton) closeButton.onClick.AddListener(CloseInfo);
         if (infoPanel) infoPanel.SetActive(false);
-        if (overlay) overlay.SetActive(false);
+        //if (overlay) overlay.SetActive(false);
         if (bank) bank.OnChanged += RefreshAllItems;
     }
     void OnDestroy()
@@ -114,7 +114,7 @@ public class StoreManager : MonoBehaviour
         var panelRT = (RectTransform)infoPanel.transform;
         panelRT.SetParent(infoOriginalParent, false);
         infoPanel.SetActive(false);
-        overlay.SetActive(false);
+        //overlay.SetActive(false);
     }
 
     public void TryBuy(FlowerDef def,int qty = 1)

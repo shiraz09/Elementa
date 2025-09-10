@@ -1070,8 +1070,6 @@ GameObject:
   - component: {fileID: 8144837741708951641}
   - component: {fileID: 515846367146884973}
   - component: {fileID: 286675429797704422}
-  - component: {fileID: 3102659394564324347}
-  - component: {fileID: 3958119967868821167}
   m_Layer: 5
   m_Name: Item_Pink
   m_TagString: Untagged
@@ -1099,10 +1097,10 @@ RectTransform:
   - {fileID: 885105377591827984}
   m_Father: {fileID: 6307016605433982124}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 623, y: -112}
-  m_SizeDelta: {x: 150, y: 200}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8144837741708951641
 CanvasRenderer:
@@ -1165,46 +1163,6 @@ MonoBehaviour:
   buyButtonInCard: {fileID: 5242120749537623738}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
---- !u!114 &3102659394564324347
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1033287049236270022}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
-  m_Padding:
-    m_Left: 12
-    m_Right: 12
-    m_Top: 50
-    m_Bottom: -250
-  m_ChildAlignment: 0
-  m_Spacing: 8
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 1
-  m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
---- !u!114 &3958119967868821167
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1033287049236270022}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 0
-  m_VerticalFit: 0
 --- !u!1 &1089765507730499456
 GameObject:
   m_ObjectHideFlags: 0
@@ -1610,7 +1568,6 @@ GameObject:
   - component: {fileID: 2043689411543924930}
   - component: {fileID: 360311360138456660}
   - component: {fileID: 2060229136528355259}
-  - component: {fileID: 8124585106179407867}
   m_Layer: 5
   m_Name: Btn_Pink
   m_TagString: Untagged
@@ -1719,26 +1676,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &8124585106179407867
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1754188540753822812}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
-  m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: -1
-  m_PreferredWidth: 180
-  m_PreferredHeight: 100
-  m_FlexibleWidth: 0
-  m_FlexibleHeight: 0
-  m_LayoutPriority: 1
 --- !u!1 &1767925548891078419
 GameObject:
   m_ObjectHideFlags: 0
@@ -1887,8 +1824,6 @@ GameObject:
   - component: {fileID: 5214993672690887823}
   - component: {fileID: 8904869828101754334}
   - component: {fileID: 647819234339607469}
-  - component: {fileID: 4124214505028562659}
-  - component: {fileID: 3583064210602533719}
   m_Layer: 5
   m_Name: Item_Red
   m_TagString: Untagged
@@ -1916,10 +1851,10 @@ RectTransform:
   - {fileID: 6708853541915223158}
   m_Father: {fileID: 6307016605433982124}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 449, y: -112}
-  m_SizeDelta: {x: 150, y: 200}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5214993672690887823
 CanvasRenderer:
@@ -1982,46 +1917,6 @@ MonoBehaviour:
   buyButtonInCard: {fileID: 5359413061519890991}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
---- !u!114 &4124214505028562659
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1786387759403701082}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
-  m_Padding:
-    m_Left: 12
-    m_Right: 12
-    m_Top: 50
-    m_Bottom: -250
-  m_ChildAlignment: 0
-  m_Spacing: 8
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 1
-  m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
---- !u!114 &3583064210602533719
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1786387759403701082}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 0
-  m_VerticalFit: 0
 --- !u!1 &1825035964946613609
 GameObject:
   m_ObjectHideFlags: 0
@@ -2427,7 +2322,6 @@ GameObject:
   - component: {fileID: 5736823297923558587}
   - component: {fileID: 9220253478875053135}
   - component: {fileID: 469390501732148915}
-  - component: {fileID: 854220963127164932}
   m_Layer: 5
   m_Name: Btn_Red
   m_TagString: Untagged
@@ -2536,26 +2430,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &854220963127164932
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2920507308279248145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
-  m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: -1
-  m_PreferredWidth: 180
-  m_PreferredHeight: 100
-  m_FlexibleWidth: 0
-  m_FlexibleHeight: 0
-  m_LayoutPriority: 1
 --- !u!1 &3300977735058332987
 GameObject:
   m_ObjectHideFlags: 0
@@ -3354,8 +3228,6 @@ GameObject:
   - component: {fileID: 6088330155121726282}
   - component: {fileID: 6685833352178665742}
   - component: {fileID: 7208881123691910904}
-  - component: {fileID: 4028230827570260942}
-  - component: {fileID: 4766597896368545249}
   m_Layer: 5
   m_Name: Item_Green
   m_TagString: Untagged
@@ -3383,10 +3255,10 @@ RectTransform:
   - {fileID: 8341442676998421834}
   m_Father: {fileID: 6307016605433982124}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 797, y: -112}
-  m_SizeDelta: {x: 150, y: 200}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6088330155121726282
 CanvasRenderer:
@@ -3449,46 +3321,6 @@ MonoBehaviour:
   buyButtonInCard: {fileID: 8540765805475065269}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
---- !u!114 &4028230827570260942
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4523745236925832245}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
-  m_Padding:
-    m_Left: 12
-    m_Right: 12
-    m_Top: 50
-    m_Bottom: -250
-  m_ChildAlignment: 0
-  m_Spacing: 8
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 1
-  m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
---- !u!114 &4766597896368545249
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4523745236925832245}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 0
-  m_VerticalFit: 0
 --- !u!1 &4617878619096846531
 GameObject:
   m_ObjectHideFlags: 0
@@ -3622,7 +3454,6 @@ GameObject:
   - component: {fileID: 8084535629174671651}
   - component: {fileID: 5250808286484489962}
   - component: {fileID: 7716105767430957568}
-  - component: {fileID: 3546892874040549653}
   m_Layer: 5
   m_Name: Btn_Blue
   m_TagString: Untagged
@@ -3731,26 +3562,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &3546892874040549653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4722278593013593060}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
-  m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: -1
-  m_PreferredWidth: 96
-  m_PreferredHeight: 96
-  m_FlexibleWidth: 1
-  m_FlexibleHeight: 1
-  m_LayoutPriority: 1
 --- !u!1 &4777659150211965718
 GameObject:
   m_ObjectHideFlags: 0
@@ -4150,7 +3961,6 @@ GameObject:
   - component: {fileID: 3903490028910200347}
   - component: {fileID: 2414257209766303340}
   - component: {fileID: 8147616463120858662}
-  - component: {fileID: 2452677357409811838}
   - component: {fileID: 2880043505621028967}
   m_Layer: 5
   m_Name: Store
@@ -4219,26 +4029,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2452677357409811838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6022408729862488867}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
-  m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: -1
-  m_PreferredWidth: -1
-  m_PreferredHeight: 120
-  m_FlexibleWidth: -1
-  m_FlexibleHeight: 0
-  m_LayoutPriority: 1
 --- !u!114 &2880043505621028967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4253,10 +4043,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Store
   board: {fileID: 0}
   bank: {fileID: 2607792951292906309}
-  btnBlue: {fileID: 0}
-  btnRed: {fileID: 0}
-  btnPink: {fileID: 0}
-  btnGreen: {fileID: 0}
+  btnBlue: {fileID: 7716105767430957568}
+  btnRed: {fileID: 469390501732148915}
+  btnPink: {fileID: 2060229136528355259}
+  btnGreen: {fileID: 6328291199385867169}
   infoPanel: {fileID: 7529755601060294159}
   titleText: {fileID: 8491494739466374057}
   costText: {fileID: 6398815295030959383}
@@ -4264,7 +4054,6 @@ MonoBehaviour:
   buyButton: {fileID: 7092474715081651387}
   closeButton: {fileID: 959182853051997597}
   showAsModal: 0
-  overlay: {fileID: 0}
 --- !u!1 &6034304409895761062
 GameObject:
   m_ObjectHideFlags: 0
@@ -4549,7 +4338,6 @@ GameObject:
   - component: {fileID: 5028963359467471123}
   - component: {fileID: 207821938715966127}
   - component: {fileID: 6328291199385867169}
-  - component: {fileID: 6198794825375971381}
   m_Layer: 5
   m_Name: Btn_Green
   m_TagString: Untagged
@@ -4658,26 +4446,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &6198794825375971381
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6505179727988311866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
-  m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: -1
-  m_PreferredWidth: 180
-  m_PreferredHeight: 100
-  m_FlexibleWidth: 0
-  m_FlexibleHeight: 0
-  m_LayoutPriority: 1
 --- !u!1 &6558669784932831811
 GameObject:
   m_ObjectHideFlags: 0
@@ -5920,7 +5688,7 @@ MonoBehaviour:
   infoButton: {fileID: 5255349516195502488}
   buyButtonInCard: {fileID: 1248998380183453111}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
-  cantBuyColor: {r: 1, g: 0.9803922, b: 0.9803922, a: 0.050980393}
+  cantBuyColor: {r: 1, g: 0.9803922, b: 0.9803922, a: 0.34901962}
 --- !u!1 &9052583898821173791
 GameObject:
   m_ObjectHideFlags: 0
