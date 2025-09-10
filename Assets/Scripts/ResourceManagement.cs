@@ -1,19 +1,21 @@
 
 using TMPro;
 using UnityEngine;
+using System;
 
 public class ResourceManagement : MonoBehaviour
 {
     public int water = 0, sun = 0, earth = 0, grass = 0;
     public TMP_Text waterText, sunText, earthText, grassText;
-
+    public event Action OnChanged;
     //Refreshes the on-screen counters 
     void UpdateUI()
     {
-        if (waterText) waterText.text = water.ToString();
-        if (sunText) sunText.text = sun.ToString();
-        if (earthText) earthText.text = earth.ToString();
-        if (grassText) grassText.text = grass.ToString();
+        if (waterText != null) waterText.text = water.ToString();
+        if (sunText != null) sunText.text = sun.ToString();
+        if (earthText != null) earthText.text = earth.ToString();
+        if (grassText != null) grassText.text = grass.ToString();
+        OnChanged?.Invoke(); 
     }
     public bool Has(Cost c)
     {
