@@ -12,6 +12,6 @@ public class MoveablePiece : MonoBehaviour
     {
         piece.X = newX;
         piece.Y = newY;
-        piece.transform.localPosition = piece.GridRef.GetWorldPosition(newX, newY);
+        piece.transform.localPosition = piece.GridRef.GetScreenPosition(newX,newY);
     }
 }

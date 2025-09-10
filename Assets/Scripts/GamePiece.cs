@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class GamePiece : MonoBehaviour{
+public class GamePiece : MonoBehaviour
+{
     private int x;
     private int y;
     private Grid.PieceType type;
@@ -9,39 +10,63 @@ public class GamePiece : MonoBehaviour{
 
     public MoveablePiece MoveableComponent
     {
-        get{ return moveableComponent; }
+        get { return moveableComponent; }
+    }
+    private ColorPiece colorComponent;
+
+    public ColorPiece ColorComponent
+    {
+        get { return colorComponent; }
     }
     void Awake()
     {
         moveableComponent = GetComponent<MoveablePiece>();
+        colorComponent = GetComponent<ColorPiece>();
     }
-    public int X {
+    public int X
+    {
         get { return x; }
-        set{
-            if (IsMoveable()){
-                x = value; }
+        set
+        {
+            if (IsMoveable())
+            {
+                x = value;
+            }
         }
     }
-    public int Y {
+    public int Y
+    {
         get { return y; }
-        set{ if (IsMoveable()){
-                y = value;}
+        set
+        {
+            if (IsMoveable())
+            {
+                y = value;
+            }
         }
     }
-    public Grid.PieceType Type{
+    public Grid.PieceType Type
+    {
         get { return type; }
     }
-    public Grid GridRef {
+    public Grid GridRef
+    {
         get { return grid; }
     }
-    public void Init(int _x, int _y, Grid _grid, Grid.PieceType _type) {
+    public void Init(int _x, int _y, Grid _grid, Grid.PieceType _type)
+    {
         x = _x;
         y = _y;
         grid = _grid;
         type = _type;
-        
+
     }
-    public bool IsMoveable(){
-        return moveableComponent != null;}
+    public bool IsMoveable()
+    {
+        return moveableComponent != null;
+    }
+    public bool IsColored(){
+        return colorComponent != null;
+    }
     
 }

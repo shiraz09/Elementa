@@ -35,20 +35,20 @@ public class ResourceManagement : MonoBehaviour
         return true;
 
     }
-    public void Add(Grid.PieceType type, int amount = 1)
+    public void Add(Grid.elemType type, int amount = 1)
     {
         switch (type)
         {
-            case Grid.PieceType.WATER:
+            case Grid.elemType.WATER:
                 water += amount;
                 break;
-            case Grid.PieceType.SUN:
+            case Grid.elemType.SUN:
                 sun += amount;
                 break;
-            case Grid.PieceType.EARTH:
+            case Grid.elemType.EARTH:
                 earth += amount;
                 break;
-            case Grid.PieceType.GRASS:
+            case Grid.elemType.GRASS:
                 grass += amount;
                 break;
         }

@@ -52,14 +52,8 @@ MonoBehaviour:
   yDim: 8
   cellSize: 100
   piecePrefabs:
-  - type: 0
-    prefab: {fileID: 6767591698355231615, guid: 554e5f57f78a14d6684a8090dea68309, type: 3}
-  - type: 1
-    prefab: {fileID: 5990640432080540839, guid: 2228e348bee6a8c47b36d27e09be7c8c, type: 3}
   - type: 2
     prefab: {fileID: 8916939968318098730, guid: c2cbe9534622b4e44bfbe17be3c79f75, type: 3}
-  - type: 3
-    prefab: {fileID: 4080366716977307659, guid: 1a1674ec76ac84d97a8a7b570d904d2d, type: 3}
   backgroundPrefab: {fileID: 8702526761349446199, guid: 1f243ffb1f6cb4e029d7caacf2a93f3f, type: 3}
 --- !u!1 &5788487930763766362
 GameObject:

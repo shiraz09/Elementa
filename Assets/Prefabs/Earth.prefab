@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4726464855221094946}
   - component: {fileID: -2545360507575869147}
   - component: {fileID: -1171699401279892448}
+  - component: {fileID: 6879455542138048085}
   m_Layer: 5
   m_Name: Earth
   m_TagString: Untagged
@@ -101,3 +102,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e00630efc85454b5fa68b63caca1a78b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GamePiece
+--- !u!114 &6879455542138048085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8916939968318098730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85e944a63f32a467c98f2a9c44771f0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ColorPiece
+  colorSprites:
+  - color: 0
+    sprite: {fileID: 21300000, guid: 439e885680ec66b43bee4b268c10390e, type: 3}
+  - color: 1
+    sprite: {fileID: 21300000, guid: d645baafdab20da449dd5146f3195660, type: 3}
+  - color: 3
+    sprite: {fileID: 21300000, guid: 5f99726578e79574481fdb6f193d40dd, type: 3}
+  - color: 2
+    sprite: {fileID: 21300000, guid: 0707e1f31c109d9429064305cccae33c, type: 3}

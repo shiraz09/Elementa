@@ -5,7 +5,8 @@ using JetBrains.Annotations;
 public class Grid : MonoBehaviour
 {
     // Types of pieces
-    public enum PieceType { WATER, SUN, EARTH, GRASS };
+    public enum PieceType { EARTH };
+    public enum elemType{EARTH,GRASS,WATER,SUN}
 
     // Pair each type with its prefab
     [System.Serializable]
@@ -48,18 +49,11 @@ public class Grid : MonoBehaviour
             {
                 GameObject background = Instantiate(
                     backgroundPrefab,
-                    new Vector3(x, y, 0f),   // temporary position
+                   Vector3.zero,
                     Quaternion.identity
                 );
                 background.transform.parent = transform;
-
-                // Position background in centered grid
-                background.GetComponent<RectTransform>().anchoredPosition =
-                    new Vector3(
-                        (x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2),
-                        (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2),
-                        0f
-                    );
+                background.GetComponent<RectTransform>().anchoredPosition =GetScreenPosition(x,y);
             }
         }
 
@@ -69,31 +63,35 @@ public class Grid : MonoBehaviour
         {
             for (int y = 0; y < yDim; y++)
             {
-                // Pick random type from list
-                PiecePrefab entry = piecePrefabs[Random.Range(0, piecePrefabs.Length)];
-                GameObject prefab = piecePrefabDict[entry.type];
-
                 // Create piece
-                GameObject go = Instantiate(prefab, new Vector3(x, y, -0.1f), Quaternion.identity);
-                go.name = $"Piece({x},{y})";
-                go.transform.parent = transform;
+                GameObject newPiece = (GameObject)Instantiate(piecePrefabDict[PieceType.EARTH], Vector3.zero , Quaternion.identity);
+                newPiece.name = $"Piece({x},{y})";
+                newPiece.transform.parent = transform;
+                newPiece.GetComponent<RectTransform>().anchoredPosition =GetScreenPosition(x,y);
 
-                // Position piece in centered grid
-                go.GetComponent<RectTransform>().anchoredPosition =
-                    new Vector3(
-                        (x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2),
-                        (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2),
-                        0f
-                    );
-
-                pieces[x, y] = go.GetComponent<GamePiece>();
+                pieces[x, y] = newPiece.GetComponent<GamePiece>();
+                pieces[x, y].Init(x, y, this, PieceType.EARTH);
+                if (pieces[x, y].IsMoveable())
+                {
+                    pieces[x, y].MoveableComponent.Move(x, y);
+                }
+                if (pieces[x, y].IsColored())
+                {
+                    pieces[x, y].ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, pieces[x, y].ColorComponent.NumColors));
+                }
             }
         }
     }
-    public Vector2 GetWorldPosition(int x, int y) {
-       return new Vector2(transform.position.x - xDim / 2.0f + x, transform.position.y + yDim / 2.0f - y);
+    public Vector2 GetScreenPosition(int x, int y)
+    {
+         return new Vector2(
+                        (x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2),
+                        (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2)
+                        
+                    );
     }
-    public enum TargetMode { None,Row, Column, Cell3x3, AllOfType }
+    
+    public enum TargetMode { None, Row, Column, Cell3x3, AllOfType }
     private TargetMode pendingMode = TargetMode.None;
     public void EnterTargetMode(TargetMode mode){
         pendingMode = mode;
