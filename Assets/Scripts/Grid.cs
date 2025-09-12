@@ -7,7 +7,7 @@ using NUnit.Framework;
 public class Grid : MonoBehaviour
 {
     // Types of pieces
-    public enum PieceType { EARTH,GRASS,WATER,SUN };
+    public enum PieceType { EARTH, GRASS, WATER, SUN };
 
     // Pair each type with its prefab
     [System.Serializable]
@@ -24,7 +24,7 @@ public class Grid : MonoBehaviour
     public float fillTime;
     private GamePiece pressedPiece;
     private GamePiece enteredPiece;
-    
+
 
     // Prefabs for pieces and background
     public PiecePrefab[] piecePrefabs;
@@ -84,13 +84,13 @@ public class Grid : MonoBehaviour
         StartCoroutine(Fill());
     }
     private PieceType GetRandomType()
-{
-    if (availableTypes == null || availableTypes.Length == 0)
-        return PieceType.EARTH;
+    {
+        if (availableTypes == null || availableTypes.Length == 0)
+            return PieceType.EARTH;
 
-    int index = UnityEngine.Random.Range(0, availableTypes.Length);
-    return availableTypes[index];
-}
+        int index = UnityEngine.Random.Range(0, availableTypes.Length);
+        return availableTypes[index];
+    }
     public IEnumerator Fill()
     {
         while (FillStep())
@@ -123,30 +123,30 @@ public class Grid : MonoBehaviour
                 }
             }
         }
-            for (int x = 0; x < xDim; x++)
+        for (int x = 0; x < xDim; x++)
+        {
+            if (pieces[x, 0] == null)
             {
-                if (pieces[x, 0] == null)
-                {
-                    
-                    PieceType type = GetRandomType();
-                    GameObject newPiece = Instantiate(piecePrefabDict[type]);
-                    newPiece.transform.SetParent(transform, false);
-                    RectTransform rectTransform = newPiece.GetComponent<RectTransform>();
-                    if (rectTransform != null)
-                    {
-                        rectTransform.sizeDelta = new Vector2(cellSize, cellSize);
-                        rectTransform.anchoredPosition = GetUIPos(x, -1);
-                    }
-                    GamePiece gamePiece = newPiece.GetComponent<GamePiece>();
-                    if (gamePiece == null) gamePiece = newPiece.AddComponent<GamePiece>();
-                    gamePiece.Init(x, -1, this, type);
-                    gamePiece.MoveableComponent.Move(x, 0);
-                    pieces[x, 0] = gamePiece;
-                    movedPiece = true;
 
+                PieceType type = GetRandomType();
+                GameObject newPiece = Instantiate(piecePrefabDict[type]);
+                newPiece.transform.SetParent(transform, false);
+                RectTransform rectTransform = newPiece.GetComponent<RectTransform>();
+                if (rectTransform != null)
+                {
+                    rectTransform.sizeDelta = new Vector2(cellSize, cellSize);
+                    rectTransform.anchoredPosition = GetUIPos(x, -1);
                 }
+                GamePiece gamePiece = newPiece.GetComponent<GamePiece>();
+                if (gamePiece == null) gamePiece = newPiece.AddComponent<GamePiece>();
+                gamePiece.Init(x, -1, this, type);
+                gamePiece.MoveableComponent.Move(x, 0);
+                pieces[x, 0] = gamePiece;
+                movedPiece = true;
 
             }
+
+        }
 
         return movedPiece;
     }
@@ -165,7 +165,7 @@ public class Grid : MonoBehaviour
         gameObject.name = $"Piece({x},{y})-{type}";
         gameObject.transform.SetParent(transform, false); // UI
         RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
-        if (rectTransform!=null) { rectTransform.sizeDelta = new Vector2(cellSize, cellSize); rectTransform.anchoredPosition = GetUIPos(x, y); }
+        if (rectTransform != null) { rectTransform.sizeDelta = new Vector2(cellSize, cellSize); rectTransform.anchoredPosition = GetUIPos(x, y); }
         GamePiece gamePiece = gameObject.GetComponent<GamePiece>();
         if (gamePiece == null) gamePiece = gameObject.AddComponent<GamePiece>();
         gamePiece.Init(x, y, this, type);
@@ -178,23 +178,7 @@ public class Grid : MonoBehaviour
         return (piece1.X == piece2.X && (int)Mathf.Abs(piece1.Y - piece2.Y) == 1) ||
                (piece1.Y == piece2.Y && (int)Mathf.Abs(piece1.X - piece2.X) == 1);
     }
-    public void SwapPieces(GamePiece piece1, GamePiece piece2)
-    {
-        if (!piece1.IsMoveable() || !piece2.IsMoveable()) return;
-        if (!IsAdjacent(piece1, piece2)) return;
-        if (piece1.IsMoveable() && piece2.IsMoveable())
-        {
-            // Swap pieces in array
-            pieces[piece1.X, piece1.Y] = piece2;
-            pieces[piece2.X, piece2.Y] = piece1;
-
-            // Swap their coordinates
-            int piece1X = piece1.X;
-            int piece1Y = piece1.Y;
-            piece1.MoveableComponent.Move(piece2.X, piece2.Y);
-            piece2.MoveableComponent.Move(piece1X, piece1Y);
-        }   
-    }
+    
     public void PressPiece(GamePiece piece)
     {
         pressedPiece = piece;
@@ -213,6 +197,183 @@ public class Grid : MonoBehaviour
         pressedPiece = null;
         enteredPiece = null;
     }
+    public List<GamePiece> GetMatch(GamePiece piece, int newX, int newY)
+    {
+        if (piece == null) return null;
+        int centerX;
+        if (newX >= 0)
+        {
+            centerX = newX;
+        }
+        else
+        {
+            centerX = piece.X;
+        }
+
+        int centerY;
+        if (newY >= 0)
+        {
+            centerY = newY;
+        }
+        else
+        {
+            centerY = piece.Y;
+        }
+        PieceType pieceType = piece.Type;
+        List<GamePiece> result = new List<GamePiece>();
+        List<GamePiece> linePieces = new List<GamePiece>();
+        linePieces.Add(piece);
+        int x;
+        for (x = centerX - 1; x >= 0; x--)
+        {
+            GamePiece p = pieces[x, centerY];
+            if (p == null || p.Type != pieceType) break;
+            linePieces.Add(p);
+        }
+        for (x = centerX + 1; x < xDim; x++)
+        {
+            GamePiece p = pieces[x, centerY];
+            if (p == null || p.Type != pieceType) break;
+            linePieces.Add(p);
+        }
+        if (linePieces.Count >= 3)
+        {
+            for (int i = 0; i < linePieces.Count; i++)
+                if (!result.Contains(linePieces[i])) result.Add(linePieces[i]);
+        }
+        linePieces.Clear();
+        linePieces.Add(piece);
+
+        int y;
+        for (y = centerY - 1; y >= 0; y--)
+        {
+            GamePiece p = pieces[centerX, y];
+            if (p == null || p.Type != pieceType) break;
+            linePieces.Add(p);
+        }
+        for (y = centerY + 1; y < yDim; y++)
+        {
+            GamePiece p = pieces[centerX, y];
+            if (p == null || p.Type != pieceType) break;
+            linePieces.Add(p);
+        }
+        if (linePieces.Count >= 3)
+        {
+            for (int i = 0; i < linePieces.Count; i++)
+                if (!result.Contains(linePieces[i])) result.Add(linePieces[i]);
+        }
+
+        if (result.Count >= 3) return result;
+        return null;
+
+    }
+    private void RemoveAt(int x, int y)
+    {
+        GamePiece piece = pieces[x, y];
+        if (piece != null)
+        {
+            Destroy(piece.gameObject);
+            pieces[x, y] = null;
+        }
+        
+
+    }
+    public void SwapPieces(GamePiece firstPiece, GamePiece secondPiece)
+    {
+        if (firstPiece == null || secondPiece == null) return;
+        if (!firstPiece.IsMoveable() || !secondPiece.IsMoveable()) return;
+        if (!IsAdjacent(firstPiece, secondPiece)) return;
+
+        // Original coordinates before swapping
+        int firstX = firstPiece.X;
+        int firstY = firstPiece.Y;
+        int secondX = secondPiece.X;
+        int secondY = secondPiece.Y;
+
+        // Swap in the board array and animate the move
+        pieces[firstX, firstY] = secondPiece;
+        firstPiece.MoveableComponent.Move(secondX, secondY);
+
+        pieces[secondX, secondY] = firstPiece;
+        secondPiece.MoveableComponent.Move(firstX, firstY);
+
+        // Find matches that result from the new positions
+        List<GamePiece> matchForFirst = GetMatch(firstPiece, secondX, secondY);
+        List<GamePiece> matchForSecond = GetMatch(secondPiece, firstX, firstY);
+
+        // Union matches (no duplicates)
+        HashSet<GamePiece> piecesToClear = new HashSet<GamePiece>();
+        if (matchForFirst != null) { for (int i = 0; i < matchForFirst.Count; i++) piecesToClear.Add(matchForFirst[i]); }
+        if (matchForSecond != null) { for (int i = 0; i < matchForSecond.Count; i++) piecesToClear.Add(matchForSecond[i]); }
+
+        // No match -> revert the swap
+        if (piecesToClear.Count < 3)
+        {
+            pieces[firstX, firstY] = firstPiece;
+            firstPiece.MoveableComponent.Move(firstX, firstY);
+
+            pieces[secondX, secondY] = secondPiece;
+            secondPiece.MoveableComponent.Move(secondX, secondY);
+            return;
+        }
+
+        // We have a match -> clear the matched pieces
+        foreach (GamePiece p in piecesToClear)
+        {
+            if (p != null) RemoveAt(p.X, p.Y);
+        }
+
+        // Drop, refill and resolve cascades until the board is stable
+        StartCoroutine(FillAndResolve());
+    }
+    private HashSet<GamePiece> FindAllMatchesOnBoard()
+    {
+        HashSet<GamePiece> set = new HashSet<GamePiece>();
+
+        for (int x = 0; x < xDim; x++)
+        {
+            for (int y = 0; y < yDim; y++)
+            {
+                GamePiece p = pieces[x, y];
+                if (p == null) continue;
+
+                List<GamePiece> m = GetMatch(p, x, y);
+                if (m != null && m.Count >= 3)
+                {
+                    for (int i = 0; i < m.Count; i++) set.Add(m[i]);
+                }
+            }
+        }
+        return set;
+    }
+    private System.Collections.IEnumerator FillAndResolve()
+{
+    // Drop and refill until no piece moved this step
+    while (FillStep())
+    {
+        yield return new WaitForSeconds(fillTime);
+    }
+
+    // After gravity/refill, see if new matches were created
+    HashSet<GamePiece> more = FindAllMatchesOnBoard();
+    if (more.Count >= 3)
+    {
+        foreach (GamePiece p in more)
+        {
+            if (p != null) RemoveAt(p.X, p.Y);
+        }
+
+        // Run another cascade cycle
+        yield return new WaitForSeconds(0.05f);
+        StartCoroutine(FillAndResolve());
+    }
+}
+
+
+
+
+
+
     
 
     public enum TargetMode { None, Row, Column, Cell3x3, AllOfType }
