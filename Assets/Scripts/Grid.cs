@@ -1,12 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using System.Collections;
+using NUnit.Framework;
 
 public class Grid : MonoBehaviour
 {
     // Types of pieces
-    public enum PieceType { EARTH,EMPTY };
-    public enum elemType{EARTH,GRASS,WATER,SUN}
+    public enum PieceType { EARTH,GRASS,WATER,SUN };
 
     // Pair each type with its prefab
     [System.Serializable]
@@ -20,10 +21,15 @@ public class Grid : MonoBehaviour
     public int xDim = 8;
     public int yDim = 8;
     public float cellSize = 1f;
+    public float fillTime;
+    private GamePiece pressedPiece;
+    private GamePiece enteredPiece;
+    
 
     // Prefabs for pieces and background
     public PiecePrefab[] piecePrefabs;
     public GameObject backgroundPrefab;
+    private PieceType[] availableTypes;
 
     // Dictionary: type → prefab
     private Dictionary<PieceType, GameObject> piecePrefabDict;
@@ -36,24 +42,32 @@ public class Grid : MonoBehaviour
         piecePrefabDict = new Dictionary<PieceType, GameObject>();
         for (int i = 0; i < piecePrefabs.Length; i++)
         {
-            if (!piecePrefabDict.ContainsKey(piecePrefabs[i].type) && piecePrefabs[i].prefab != null)
+            PiecePrefab e = piecePrefabs[i];
+            if (e.prefab != null && !piecePrefabDict.ContainsKey(e.type))
             {
-                piecePrefabDict.Add(piecePrefabs[i].type, piecePrefabs[i].prefab);
+                piecePrefabDict.Add(e.type, e.prefab);
             }
         }
+        availableTypes = new PieceType[piecePrefabDict.Count];
+        piecePrefabDict.Keys.CopyTo(availableTypes, 0);
+
+        RectTransform boardRT = (RectTransform)transform;
+        boardRT.sizeDelta = new Vector2(xDim * cellSize, yDim * cellSize);
+        boardRT.pivot = new Vector2(0.5f, 0.5f);
 
         // Create background tiles
         for (int x = 0; x < xDim; x++)
         {
             for (int y = 0; y < yDim; y++)
             {
-                GameObject background = Instantiate(
-                    backgroundPrefab,
-                   Vector3.zero,
-                    Quaternion.identity
-                );
-                background.transform.parent = transform;
-                background.GetComponent<RectTransform>().anchoredPosition = GetScreenPosition(x, y);
+                GameObject background = Instantiate(backgroundPrefab);
+                background.name = $"BG({x},{y})";
+                background.transform.SetParent(transform, false);
+                RectTransform rectTransform = background.GetComponent<RectTransform>();
+                if (rectTransform) { rectTransform.sizeDelta = new Vector2(cellSize, cellSize); rectTransform.anchoredPosition = GetUIPos(x, y); }
+                var img = background.GetComponent<UnityEngine.UI.Image>();
+                if (img) img.raycastTarget = false;
+
             }
         }
 
@@ -63,53 +77,81 @@ public class Grid : MonoBehaviour
         {
             for (int y = 0; y < yDim; y++)
             {
-                // Create piece
-                SpawnnewPiece(x, y, PieceType.EMPTY);
+                PieceType type = availableTypes[UnityEngine.Random.Range(0, availableTypes.Length)];
+                SpawnNewPiece(x, y, type);
             }
         }
-        Fill();
+        StartCoroutine(Fill());
     }
-    public void Fill()
+    private PieceType GetRandomType()
+{
+    if (availableTypes == null || availableTypes.Length == 0)
+        return PieceType.EARTH;
+
+    int index = UnityEngine.Random.Range(0, availableTypes.Length);
+    return availableTypes[index];
+}
+    public IEnumerator Fill()
     {
-        while (FillStep()){}
+        while (FillStep())
+        {
+            yield return new WaitForSeconds(fillTime);
+
+        }
+
     }
     public bool FillStep()
     {
         bool movedPiece = false;
-        for (int y = yDim - 2; y >= 0; y--){
-            for (int x = 0; x < xDim; x++){
+        for (int y = yDim - 2; y >= 0; y--)
+        {
+            for (int x = 0; x < xDim; x++)
+            {
                 GamePiece piece = pieces[x, y];
-                if (piece.IsMoveable()){
+                if (piece != null && piece.IsMoveable())
+                {
                     GamePiece pieceBelow = pieces[x, y + 1];
-                    if (pieceBelow.Type == PieceType.EMPTY){
+                    if (pieceBelow == null)
+                    {
                         piece.MoveableComponent.Move(x, y + 1);
                         pieces[x, y + 1] = piece;
-                        SpawnnewPiece(x, y, PieceType.EMPTY);
+                        pieces[x, y] = null;
                         movedPiece = true;
+
                     }
+
                 }
             }
         }
-        for (int x = 0; x < xDim; x++){
-            GamePiece pieceBelow = pieces[x, 0];
-            if (pieceBelow.Type == PieceType.EMPTY){
-                GameObject newPiece = (GameObject)Instantiate(
-                piecePrefabDict[PieceType.EARTH], GetScreenPosition(x,-1), Quaternion.identity);
-                newPiece.transform.parent = transform;
-                pieces[x, 0] = newPiece.GetComponent<GamePiece>();
-                pieces[x, 0].Init(x, -1, this, PieceType.EARTH);
-                pieces[x, 0].MoveableComponent.Move(x, 0);
-                pieces[x, 0].ColorComponent.SetColor(
-                    (ColorPiece.ColorType)Random.Range(0, pieces[x, 0].ColorComponent.NumColors)
-                );
-            }
-    movedPiece = true;
-    
-}
+            for (int x = 0; x < xDim; x++)
+            {
+                if (pieces[x, 0] == null)
+                {
+                    
+                    PieceType type = GetRandomType();
+                    GameObject newPiece = Instantiate(piecePrefabDict[type]);
+                    newPiece.transform.SetParent(transform, false);
+                    RectTransform rectTransform = newPiece.GetComponent<RectTransform>();
+                    if (rectTransform != null)
+                    {
+                        rectTransform.sizeDelta = new Vector2(cellSize, cellSize);
+                        rectTransform.anchoredPosition = GetUIPos(x, -1);
+                    }
+                    GamePiece gamePiece = newPiece.GetComponent<GamePiece>();
+                    if (gamePiece == null) gamePiece = newPiece.AddComponent<GamePiece>();
+                    gamePiece.Init(x, -1, this, type);
+                    gamePiece.MoveableComponent.Move(x, 0);
+                    pieces[x, 0] = gamePiece;
+                    movedPiece = true;
 
-return movedPiece;
+                }
+
+            }
+
+        return movedPiece;
     }
-    public Vector2 GetScreenPosition(int x, int y)
+
+    public Vector2 GetUIPos(int x, int y)
     {
         return new Vector2(
                        (x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2),
@@ -117,15 +159,59 @@ return movedPiece;
 
                    );
     }
-    public GamePiece SpawnnewPiece(int x, int y, PieceType type)
+    public GamePiece SpawnNewPiece(int x, int y, PieceType type)
     {
-        GameObject newPiece = (GameObject)Instantiate(piecePrefabDict[type], GetScreenPosition(x, y), Quaternion.identity);
-        newPiece.transform.parent = transform;
-        pieces[x, y] = newPiece.GetComponent<GamePiece>();
-        pieces[x, y].Init(x, y, this, type);
-        return pieces[x, y];
+        GameObject gameObject = Instantiate(piecePrefabDict[type]);
+        gameObject.name = $"Piece({x},{y})-{type}";
+        gameObject.transform.SetParent(transform, false); // UI
+        RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
+        if (rectTransform!=null) { rectTransform.sizeDelta = new Vector2(cellSize, cellSize); rectTransform.anchoredPosition = GetUIPos(x, y); }
+        GamePiece gamePiece = gameObject.GetComponent<GamePiece>();
+        if (gamePiece == null) gamePiece = gameObject.AddComponent<GamePiece>();
+        gamePiece.Init(x, y, this, type);
+
+        pieces[x, y] = gamePiece;
+        return gamePiece;
+    }
+    public bool IsAdjacent(GamePiece piece1, GamePiece piece2)
+    {
+        return (piece1.X == piece2.X && (int)Mathf.Abs(piece1.Y - piece2.Y) == 1) ||
+               (piece1.Y == piece2.Y && (int)Mathf.Abs(piece1.X - piece2.X) == 1);
+    }
+    public void SwapPieces(GamePiece piece1, GamePiece piece2)
+    {
+        if (!piece1.IsMoveable() || !piece2.IsMoveable()) return;
+        if (!IsAdjacent(piece1, piece2)) return;
+        if (piece1.IsMoveable() && piece2.IsMoveable())
+        {
+            // Swap pieces in array
+            pieces[piece1.X, piece1.Y] = piece2;
+            pieces[piece2.X, piece2.Y] = piece1;
+
+            // Swap their coordinates
+            int piece1X = piece1.X;
+            int piece1Y = piece1.Y;
+            piece1.MoveableComponent.Move(piece2.X, piece2.Y);
+            piece2.MoveableComponent.Move(piece1X, piece1Y);
+        }   
+    }
+    public void PressPiece(GamePiece piece)
+    {
+        pressedPiece = piece;
+    }
+    public void EnterPiece(GamePiece piece)
+    {
+        enteredPiece = piece;
+    }
+    public void ReleasePiece()
+    {
+        if (IsAdjacent(pressedPiece, enteredPiece))
+        {
+            SwapPieces(pressedPiece, enteredPiece);
+        }
     }
     
+
     public enum TargetMode { None, Row, Column, Cell3x3, AllOfType }
     private TargetMode pendingMode = TargetMode.None;
     public void EnterTargetMode(TargetMode mode){
