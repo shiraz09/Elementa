@@ -201,14 +201,17 @@ public class Grid : MonoBehaviour
     }
     public void EnterPiece(GamePiece piece)
     {
-        enteredPiece = piece;
+        if (pressedPiece != null && piece != pressedPiece)
+            enteredPiece = piece;
     }
     public void ReleasePiece()
     {
-        if (IsAdjacent(pressedPiece, enteredPiece))
+        if (pressedPiece != null && enteredPiece != null && IsAdjacent(pressedPiece, enteredPiece))
         {
             SwapPieces(pressedPiece, enteredPiece);
         }
+        pressedPiece = null;
+        enteredPiece = null;
     }
     
 

@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class GamePiece : MonoBehaviour
+
+public class GamePiece : MonoBehaviour,IPointerDownHandler, IPointerEnterHandler, IPointerUpHandler
 {
     private int x;
     private int y;
@@ -61,20 +63,20 @@ public class GamePiece : MonoBehaviour
         type = _type;
 
     }
-    void OnMouseEnter()
+    public void OnPointerDown(PointerEventData e)
+    {
+        grid.PressPiece(this);
+    }
+    public void OnPointerEnter(PointerEventData e)
     {
         grid.EnterPiece(this);
     }
-    void OnMouseDown()
-    {
-        grid.PressPiece(this);
-            
-    }
-    void OnMouseUp()
+    public void OnPointerUp(PointerEventData e)
     {
         grid.ReleasePiece();
-        
     }
+    
+
     public bool IsMoveable()
     {
         return moveableComponent != null;
