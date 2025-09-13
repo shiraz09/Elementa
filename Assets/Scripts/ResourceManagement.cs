@@ -8,6 +8,8 @@ public class ResourceManagement : MonoBehaviour
     public int water = 0, sun = 0, earth = 0, grass = 0;
     public TMP_Text waterText, sunText, earthText, grassText;
     public event Action OnChanged;
+    void Start() { UpdateUI(); }
+    void Awake() { UpdateUI(); }
     //Refreshes the on-screen counters 
     void UpdateUI()
     {

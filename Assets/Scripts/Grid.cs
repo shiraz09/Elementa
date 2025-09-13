@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using System.Collections;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 public class Grid : MonoBehaviour
 {
     // Types of pieces
     public enum PieceType { EARTH, GRASS, WATER, SUN };
+    public ResourceManagement bank;
 
     // Pair each type with its prefab
     [System.Serializable]
@@ -102,7 +104,7 @@ public class Grid : MonoBehaviour
         {
             foreach (var p in startMatches)
             {
-                if (p != null) RemoveAt(p.X, p.Y);
+                if (p != null) RemoveAt(p.X, p.Y,true);
             }
             yield return new WaitForSeconds(0.05f);
             yield return StartCoroutine(FillAndResolve());
@@ -278,11 +280,15 @@ public class Grid : MonoBehaviour
         return null;
 
     }
-    private void RemoveAt(int x, int y)
+    private void RemoveAt(int x, int y, bool awardResource= false)
     {
         GamePiece piece = pieces[x, y];
         if (piece != null)
         {
+            if (awardResource && bank != null)
+                bank.Add(piece.Type,1);
+        
+        
             Destroy(piece.gameObject);
             pieces[x, y] = null;
         }
@@ -290,7 +296,7 @@ public class Grid : MonoBehaviour
 
     }
    public void SwapPieces(GamePiece firstPiece, GamePiece secondPiece)
-{
+    {
     if (firstPiece == null || secondPiece == null) return;
     if (!firstPiece.IsMoveable() || !secondPiece.IsMoveable()) return;
     if (!IsAdjacent(firstPiece, secondPiece)) return;
@@ -331,7 +337,7 @@ public class Grid : MonoBehaviour
     {
         StartCoroutine(FillAndResolve());
     }
-}
+    }
     private HashSet<GamePiece> FindAllMatchesOnBoard()
     {
         HashSet<GamePiece> set = new HashSet<GamePiece>();
@@ -340,40 +346,40 @@ public class Grid : MonoBehaviour
         {
             for (int y = 0; y < yDim; y++)
             {
-                GamePiece p = pieces[x, y];
-                if (p == null) continue;
+                GamePiece piece = pieces[x, y];
+                if (piece == null) continue;
 
-                List<GamePiece> m = GetMatch(p, x, y);
-                if (m != null && m.Count >= 3)
+                List<GamePiece> lineMatch = GetMatch(piece, x, y);
+                if (lineMatch != null && lineMatch.Count >= 3)
                 {
-                    for (int i = 0; i < m.Count; i++) set.Add(m[i]);
+                    for (int i = 0; i < lineMatch.Count; i++) set.Add(lineMatch[i]);
                 }
             }
         }
         return set;
     }
     private System.Collections.IEnumerator FillAndResolve()
-{
-    // Drop and refill until no piece moved this step
-    while (FillStep())
     {
-        yield return new WaitForSeconds(fillTime);
-    }
-
-    // After gravity/refill, see if new matches were created
-    HashSet<GamePiece> more = FindAllMatchesOnBoard();
-    if (more.Count >= 3)
-    {
-        foreach (GamePiece p in more)
+        // Drop and refill until no piece moved this step
+        while (FillStep())
         {
-            if (p != null) RemoveAt(p.X, p.Y);
+            yield return new WaitForSeconds(fillTime);
         }
 
-        // Run another cascade cycle
-        yield return new WaitForSeconds(0.05f);
-        StartCoroutine(FillAndResolve());
+        // After gravity/refill, see if new matches were created
+        HashSet<GamePiece> more = FindAllMatchesOnBoard();
+        if (more.Count >= 3)
+        {
+            foreach (GamePiece p in more)
+            {
+                if (p != null) RemoveAt(p.X, p.Y,true);
+            }
+
+            // Run another cascade cycle
+            yield return new WaitForSeconds(0.05f);
+            StartCoroutine(FillAndResolve());
+        }
     }
-}
     public enum TargetMode { None, Row, Column, Cell3x3, AllOfType }
     private TargetMode pendingMode = TargetMode.None;
     public void EnterTargetMode(TargetMode mode){
@@ -398,6 +404,7 @@ public class Grid : MonoBehaviour
                 break;
         }
         pendingMode = TargetMode.None;
+        StartCoroutine(FillAndResolve());  
     }
     public void ClearRow(int y) {
         if (y < 0 || y >= yDim) return; // Invalid row
@@ -405,8 +412,7 @@ public class Grid : MonoBehaviour
         {
             if (pieces[x, y] != null)
             {
-                Destroy(pieces[x, y]);
-                pieces[x, y] = null;
+                RemoveAt(x, y, false); 
             }
         }
     }
@@ -417,8 +423,7 @@ public class Grid : MonoBehaviour
         {
             if (pieces[x, y] != null)
             {
-                Destroy(pieces[x, y]);
-                pieces[x, y] = null;
+                RemoveAt(x, y, false); 
             }
         }
     }
@@ -428,40 +433,28 @@ public class Grid : MonoBehaviour
         {
             for (int y = 0; y < yDim; y++)
             {
-                if (pieces[x, y] != null && pieces[x, y].CompareTag(type.ToString()))
-                {
-                    Destroy(pieces[x, y]);
-                    pieces[x, y] = null;
-                }
+                GamePiece piece = pieces[x, y];
+                if (piece != null && piece.Type == type)
+                    RemoveAt(x, y, false);  // no resource award
+        
             }
         }
     }
-    public bool ClearPiece(int x, int y)
-    {
-        GamePiece p = pieces[x, y];
-        if (p == null) return false;
-
-        if (p.IsClearable() && !p.ClearableComponent.IsBeingCleared)
-            p.ClearableComponent.Clear();
-        else
-            Destroy(p.gameObject);
-
-        pieces[x, y] = null;
-        return true;
-    }
+    
     public bool ClearAllValidMatches()
     {
         bool needsRefill = false;
         HashSet<GamePiece> toClear = new HashSet<GamePiece>();
 
+        //collect all matches (>=3) across the board
         for (int y = 0; y < yDim; y++)
         {
             for (int x = 0; x < xDim; x++)
             {
-                GamePiece p = pieces[x, y];
-                if (p == null) continue;                // ← משאירים רק את בדיקת ה-null
+                GamePiece piece = pieces[x, y];
+                if (piece == null) continue;                // ← משאירים רק את בדיקת ה-null
 
-                List<GamePiece> match = GetMatch(p, x, y);
+                List<GamePiece> match = GetMatch(piece, x, y);
                 if (match != null && match.Count >= 3)
                 {
                     for (int i = 0; i < match.Count; i++)
@@ -469,11 +462,18 @@ public class Grid : MonoBehaviour
                 }
             }
         }
+        //clear them (awardResource = true since these are match clears)
+        GamePiece[] toClearArray = new GamePiece[toClear.Count];
+        toClear.CopyTo(toClearArray);
 
-        foreach (GamePiece gp in toClear)
+        for (int i = 0; i < toClearArray.Length; i++)
         {
-            if (gp != null && ClearPiece(gp.X, gp.Y))
-                needsRefill = true;
+        GamePiece gp = toClearArray[i];
+        if (gp != null)
+        {
+            RemoveAt(gp.X, gp.Y, true); // true => add resource to bank
+            needsRefill = true;
+        }
         }
 
         return needsRefill;

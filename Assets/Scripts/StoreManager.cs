@@ -61,11 +61,12 @@ public class StoreManager : MonoBehaviour
         if (btnRed != null) btnRed.onClick.AddListener(() => ShowInfo(Red(), (RectTransform)btnRed.transform));
         if (btnPink != null) btnPink.onClick.AddListener(() => ShowInfo(Pink(), (RectTransform)btnPink.transform));
         if (btnGreen != null) btnGreen.onClick.AddListener(() => ShowInfo(Green(), (RectTransform)btnGreen.transform));
-        
+
         if (closeButton) closeButton.onClick.AddListener(CloseInfo);
         if (infoPanel) infoPanel.SetActive(false);
         //if (overlay) overlay.SetActive(false);
         if (bank) bank.OnChanged += RefreshAllItems;
+        RefreshAllItems();
     }
     void OnDestroy()
     {

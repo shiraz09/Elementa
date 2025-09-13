@@ -24,6 +24,7 @@ public class StoreItem : MonoBehaviour
     }
     void Start()
     {
+         if (store == null) { Debug.LogError("StoreItem: missing StoreManager", this); enabled = false; return; }
         def = store.GetDef(kind);
         if (titleLabel) titleLabel.text = def.title;
         if (priceLabel) priceLabel.text = store.FormatCost(def.price);
@@ -42,8 +43,12 @@ public class StoreItem : MonoBehaviour
         RefreshState();
 
     }
+    void OnDestroy() {
+    if (store != null && store.bank != null) store.bank.OnChanged -= RefreshState;
+}
     public void RefreshState()
     {
+        if (store == null || store.bank == null || def == null) return;
         bool canBuy = store.bank && store.bank.Has(def.price);
 
         if (buyButtonInCard) buyButtonInCard.interactable = canBuy;
