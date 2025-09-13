@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 
-public class GamePiece : MonoBehaviour,IPointerDownHandler, IPointerEnterHandler, IPointerUpHandler
+public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerUpHandler
 {
     private int x;
     private int y;
@@ -20,10 +20,16 @@ public class GamePiece : MonoBehaviour,IPointerDownHandler, IPointerEnterHandler
     {
         get { return colorComponent; }
     }
+    private ClearablePiece clearableComponent;
+    public ClearablePiece ClearableComponent
+    {
+        get { return clearableComponent; }
+    }
     void Awake()
     {
         moveableComponent = GetComponent<MoveablePiece>();
         colorComponent = GetComponent<ColorPiece>();
+        clearableComponent = GetComponent<ClearablePiece>();
     }
     public int X
     {
@@ -75,14 +81,19 @@ public class GamePiece : MonoBehaviour,IPointerDownHandler, IPointerEnterHandler
     {
         grid.ReleasePiece();
     }
-    
+
 
     public bool IsMoveable()
     {
         return moveableComponent != null;
     }
-    public bool IsColored(){
+    public bool IsColored()
+    {
         return colorComponent != null;
+    }
+    public bool IsClearable()
+    {
+        return clearableComponent != null;
     }
     
 }

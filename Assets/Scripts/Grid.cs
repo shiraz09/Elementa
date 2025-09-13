@@ -96,7 +96,16 @@ public class Grid : MonoBehaviour
         while (FillStep())
         {
             yield return new WaitForSeconds(fillTime);
-
+        }
+        HashSet<GamePiece> startMatches = FindAllMatchesOnBoard();
+        if (startMatches.Count >= 3)
+        {
+            foreach (var p in startMatches)
+            {
+                if (p != null) RemoveAt(p.X, p.Y);
+            }
+            yield return new WaitForSeconds(0.05f);
+            yield return StartCoroutine(FillAndResolve());
         }
 
     }
@@ -153,11 +162,13 @@ public class Grid : MonoBehaviour
 
     public Vector2 GetUIPos(int x, int y)
     {
-        return new Vector2(
-                       (x * cellSize) - (cellSize * xDim / 2) + (cellSize / 2),
-                       (y * cellSize) - (cellSize * yDim / 2) + (cellSize / 2)
+       
+        int yFlip = (yDim - 1) - y;  
 
-                   );
+        return new Vector2(
+            (x * cellSize) - (cellSize * xDim / 2f) + (cellSize / 2f),
+            (yFlip * cellSize) - (cellSize * yDim / 2f) + (cellSize / 2f)
+        );
     }
     public GamePiece SpawnNewPiece(int x, int y, PieceType type)
     {
@@ -278,54 +289,49 @@ public class Grid : MonoBehaviour
         
 
     }
-    public void SwapPieces(GamePiece firstPiece, GamePiece secondPiece)
+   public void SwapPieces(GamePiece firstPiece, GamePiece secondPiece)
+{
+    if (firstPiece == null || secondPiece == null) return;
+    if (!firstPiece.IsMoveable() || !secondPiece.IsMoveable()) return;
+    if (!IsAdjacent(firstPiece, secondPiece)) return;
+
+    int firstX = firstPiece.X;
+    int firstY = firstPiece.Y;
+    int secondX = secondPiece.X;
+    int secondY = secondPiece.Y;
+
+    // עדכון במערך + אנימציית מעבר
+    pieces[firstX, firstY] = secondPiece;
+    firstPiece.MoveableComponent.Move(secondX, secondY);
+
+    pieces[secondX, secondY] = firstPiece;
+    secondPiece.MoveableComponent.Move(firstX, firstY);
+
+    // בדיקת מאצ'ים שנוצרו
+    List<GamePiece> matchForFirst = GetMatch(firstPiece, secondX, secondY);
+    List<GamePiece> matchForSecond = GetMatch(secondPiece, firstX, firstY);
+
+    HashSet<GamePiece> piecesToClear = new HashSet<GamePiece>();
+    if (matchForFirst != null) { for (int i = 0; i < matchForFirst.Count; i++) piecesToClear.Add(matchForFirst[i]); }
+    if (matchForSecond != null) { for (int i = 0; i < matchForSecond.Count; i++) piecesToClear.Add(matchForSecond[i]); }
+
+    // אין מאץ' -> מחזירים לאחור
+    if (piecesToClear.Count < 3)
     {
-        if (firstPiece == null || secondPiece == null) return;
-        if (!firstPiece.IsMoveable() || !secondPiece.IsMoveable()) return;
-        if (!IsAdjacent(firstPiece, secondPiece)) return;
+        pieces[firstX, firstY] = firstPiece;
+        firstPiece.MoveableComponent.Move(firstX, firstY);
 
-        // Original coordinates before swapping
-        int firstX = firstPiece.X;
-        int firstY = firstPiece.Y;
-        int secondX = secondPiece.X;
-        int secondY = secondPiece.Y;
+        pieces[secondX, secondY] = secondPiece;
+        secondPiece.MoveableComponent.Move(secondX, secondY);
+        return;
+    }
 
-        // Swap in the board array and animate the move
-        pieces[firstX, firstY] = secondPiece;
-        firstPiece.MoveableComponent.Move(secondX, secondY);
-
-        pieces[secondX, secondY] = firstPiece;
-        secondPiece.MoveableComponent.Move(firstX, firstY);
-
-        // Find matches that result from the new positions
-        List<GamePiece> matchForFirst = GetMatch(firstPiece, secondX, secondY);
-        List<GamePiece> matchForSecond = GetMatch(secondPiece, firstX, firstY);
-
-        // Union matches (no duplicates)
-        HashSet<GamePiece> piecesToClear = new HashSet<GamePiece>();
-        if (matchForFirst != null) { for (int i = 0; i < matchForFirst.Count; i++) piecesToClear.Add(matchForFirst[i]); }
-        if (matchForSecond != null) { for (int i = 0; i < matchForSecond.Count; i++) piecesToClear.Add(matchForSecond[i]); }
-
-        // No match -> revert the swap
-        if (piecesToClear.Count < 3)
-        {
-            pieces[firstX, firstY] = firstPiece;
-            firstPiece.MoveableComponent.Move(firstX, firstY);
-
-            pieces[secondX, secondY] = secondPiece;
-            secondPiece.MoveableComponent.Move(secondX, secondY);
-            return;
-        }
-
-        // We have a match -> clear the matched pieces
-        foreach (GamePiece p in piecesToClear)
-        {
-            if (p != null) RemoveAt(p.X, p.Y);
-        }
-
-        // Drop, refill and resolve cascades until the board is stable
+    // יש מאץ' -> נקה את כל המאצים בלוח ואח"כ קסקדה
+    if (ClearAllValidMatches())
+    {
         StartCoroutine(FillAndResolve());
     }
+}
     private HashSet<GamePiece> FindAllMatchesOnBoard()
     {
         HashSet<GamePiece> set = new HashSet<GamePiece>();
@@ -368,14 +374,6 @@ public class Grid : MonoBehaviour
         StartCoroutine(FillAndResolve());
     }
 }
-
-
-
-
-
-
-    
-
     public enum TargetMode { None, Row, Column, Cell3x3, AllOfType }
     private TargetMode pendingMode = TargetMode.None;
     public void EnterTargetMode(TargetMode mode){
@@ -438,8 +436,51 @@ public class Grid : MonoBehaviour
             }
         }
     }
-    public void Bomb3x3(int centerX, int centerY) {
-        
+    public bool ClearPiece(int x, int y)
+    {
+        GamePiece p = pieces[x, y];
+        if (p == null) return false;
+
+        if (p.IsClearable() && !p.ClearableComponent.IsBeingCleared)
+            p.ClearableComponent.Clear();
+        else
+            Destroy(p.gameObject);
+
+        pieces[x, y] = null;
+        return true;
+    }
+    public bool ClearAllValidMatches()
+    {
+        bool needsRefill = false;
+        HashSet<GamePiece> toClear = new HashSet<GamePiece>();
+
+        for (int y = 0; y < yDim; y++)
+        {
+            for (int x = 0; x < xDim; x++)
+            {
+                GamePiece p = pieces[x, y];
+                if (p == null) continue;                // ← משאירים רק את בדיקת ה-null
+
+                List<GamePiece> match = GetMatch(p, x, y);
+                if (match != null && match.Count >= 3)
+                {
+                    for (int i = 0; i < match.Count; i++)
+                        toClear.Add(match[i]);
+                }
+            }
+        }
+
+        foreach (GamePiece gp in toClear)
+        {
+            if (gp != null && ClearPiece(gp.X, gp.Y))
+                needsRefill = true;
+        }
+
+        return needsRefill;
+    }
+    public void Bomb3x3(int centerX, int centerY)
+    {
+
     }
     
         

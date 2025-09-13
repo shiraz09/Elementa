@@ -16,7 +16,6 @@ public class MoveablePiece : MonoBehaviour
     {
         piece.X = newX;
         piece.Y = newY;
-        
         Vector2 target = piece.GridRef.GetUIPos(newX, newY);
         rect.anchoredPosition = target;
     }
