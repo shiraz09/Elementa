@@ -1,4 +1,5 @@
 using System;
+[System.Serializable]
 public struct Cost
 {
     public int water;

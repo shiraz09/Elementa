@@ -1188,6 +1188,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2880043505621028967, guid: 2f1bac88086c401439611d312a5c8229, type: 3}
+      propertyPath: bank
+      value: 
+      objectReference: {fileID: 895136885}
+    - target: {fileID: 2880043505621028967, guid: 2f1bac88086c401439611d312a5c8229, type: 3}
       propertyPath: board
       value: 
       objectReference: {fileID: 1493153525}

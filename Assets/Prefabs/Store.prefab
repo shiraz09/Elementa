@@ -837,8 +837,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 839, y: -261}
+  m_SizeDelta: {x: 150, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5508384383496647793
 CanvasRenderer:
@@ -861,7 +861,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.93962264, g: 0.40244213, b: 0.40244213, a: 0.5921569}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1152,14 +1152,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 414b4f83b22b2024492ac12d976398a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StoreItem
-  store: {fileID: 0}
-  kind: 2
+  store: {fileID: 2880043505621028967}
+  ability: {fileID: 11400000, guid: a769f90f77fe1e245bfa71e33a8cffc2, type: 2}
   iconButton: {fileID: 2060229136528355259}
   iconImage: {fileID: 360311360138456660}
   titleLabel: {fileID: 1744720709038238608}
   priceLabel: {fileID: 447037288200824831}
   effectPreviewLabel: {fileID: 2196902235707393644}
-  infoButton: {fileID: 0}
+  infoButton: {fileID: 4983090390323100546}
   buyButtonInCard: {fileID: 5242120749537623738}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
@@ -1701,7 +1701,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1767925548891078419}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1709,8 +1709,8 @@ RectTransform:
   m_Father: {fileID: 56776878797513970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 25}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2608952950422256272
@@ -1741,7 +1741,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: Buy
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1906,14 +1906,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 414b4f83b22b2024492ac12d976398a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StoreItem
-  store: {fileID: 0}
-  kind: 1
+  store: {fileID: 2880043505621028967}
+  ability: {fileID: 11400000, guid: eb2e10cac34b98a4999872575766413f, type: 2}
   iconButton: {fileID: 469390501732148915}
   iconImage: {fileID: 9220253478875053135}
   titleLabel: {fileID: 4100852565894162703}
   priceLabel: {fileID: 5097250691232984653}
   effectPreviewLabel: {fileID: 1067321800061758540}
-  infoButton: {fileID: 0}
+  infoButton: {fileID: 1462062767705277196}
   buyButtonInCard: {fileID: 5359413061519890991}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
@@ -3310,14 +3310,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 414b4f83b22b2024492ac12d976398a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StoreItem
-  store: {fileID: 0}
-  kind: 3
+  store: {fileID: 2880043505621028967}
+  ability: {fileID: 11400000, guid: 46056c7c76aab6e4787c06d8b409f49f, type: 2}
   iconButton: {fileID: 6328291199385867169}
   iconImage: {fileID: 207821938715966127}
   titleLabel: {fileID: 1418845004461185148}
   priceLabel: {fileID: 3306385102565703381}
   effectPreviewLabel: {fileID: 6217717778804403877}
-  infoButton: {fileID: 0}
+  infoButton: {fileID: 1939693815907261176}
   buyButtonInCard: {fileID: 8540765805475065269}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
@@ -3698,58 +3698,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!1 &4947454026198025400
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4507640223117907210}
-  - component: {fileID: 2607792951292906309}
-  m_Layer: 0
-  m_Name: Bank
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4507640223117907210
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4947454026198025400}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 21.461243, y: 597.2987, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3903490028910200347}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2607792951292906309
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4947454026198025400}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b35a73a3514a95b4c912e08ee9a4e32c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ResourceManagement
-  water: 10
-  sun: 0
-  earth: 0
-  grass: 0
-  waterText: {fileID: 0}
-  sunText: {fileID: 0}
-  earthText: {fileID: 0}
-  grassText: {fileID: 0}
 --- !u!1 &5060127245811866176
 GameObject:
   m_ObjectHideFlags: 0
@@ -3983,7 +3931,6 @@ RectTransform:
   m_Children:
   - {fileID: 3378474566553061784}
   - {fileID: 6307016605433982124}
-  - {fileID: 4507640223117907210}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4013,7 +3960,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -4042,11 +3989,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Store
   board: {fileID: 0}
-  bank: {fileID: 2607792951292906309}
+  bank: {fileID: 0}
   btnBlue: {fileID: 7716105767430957568}
   btnRed: {fileID: 469390501732148915}
   btnPink: {fileID: 2060229136528355259}
   btnGreen: {fileID: 6328291199385867169}
+  WaterAbility: {fileID: 11400000, guid: 345b41e7d72025f49b2a1431ada6e89c, type: 2}
+  EarthAbility: {fileID: 11400000, guid: eb2e10cac34b98a4999872575766413f, type: 2}
+  SunAbility: {fileID: 11400000, guid: a769f90f77fe1e245bfa71e33a8cffc2, type: 2}
+  GrassAbility: {fileID: 11400000, guid: 46056c7c76aab6e4787c06d8b409f49f, type: 2}
   infoPanel: {fileID: 7529755601060294159}
   titleText: {fileID: 8491494739466374057}
   costText: {fileID: 6398815295030959383}
@@ -4904,17 +4855,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: Close
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 9ad269c99dcf42b7aedefd83dd5a7b9d, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4278525568
+  m_fontColor: {r: 0.5018867, g: 0.11731165, b: 0.017992094, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -5286,8 +5237,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 80, y: -70}
-  m_SizeDelta: {x: 160, y: 140}
+  m_AnchoredPosition: {x: 546.657, y: -702.2626}
+  m_SizeDelta: {x: 995.6722, y: 315.9782}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8538583009379121239
 CanvasRenderer:
@@ -5310,8 +5261,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
-  m_RaycastTarget: 1
+  m_Color: {r: 0.824, g: 0.9803922, b: 0.9803922, a: 0.7490196}
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -5499,8 +5450,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 634, y: -261}
+  m_SizeDelta: {x: 150, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1922934979710215175
 CanvasRenderer:
@@ -5523,7 +5474,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.51529366, g: 0.79622644, b: 0.54757756, a: 0.67058825}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5678,8 +5629,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 414b4f83b22b2024492ac12d976398a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StoreItem
-  store: {fileID: 0}
-  kind: 0
+  store: {fileID: 2880043505621028967}
+  ability: {fileID: 11400000, guid: 345b41e7d72025f49b2a1431ada6e89c, type: 2}
   iconButton: {fileID: 7716105767430957568}
   iconImage: {fileID: 5250808286484489962}
   titleLabel: {fileID: 8646146386184065255}
