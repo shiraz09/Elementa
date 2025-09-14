@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e42647256bfde940b79566d996d8723, type: 3}
+  m_Name: ColumnClearAbility
+  m_EditorClassIdentifier: Assembly-CSharp::ColumnClearAbility
+  title: "Earth Flower \u2013 Column Clear"
+  description: 
+  icon: {fileID: 6626051464634953487, guid: e45838b8df68d174f93bb60ac7c2a6b8, type: 3}
+  price:
+    water: 4
+    sun: 8
+    earth: 16
+    grass: 0

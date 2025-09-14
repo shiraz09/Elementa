@@ -4,17 +4,19 @@ using UnityEngine.EventSystems;
 public class Piece : MonoBehaviour, IPointerClickHandler
 {
     public int x, y;
-    public Grid.PieceType type;
+    private GamePiece gp;
+
     private Grid board;
 
     public void Init(Grid b, int _x, int _y, Grid.PieceType _type)
     {
         board = b;
-        x = _x;
-        y = _y;
-        type = _type;
+        gp = GetComponent<GamePiece>();
+        gp.Init(_x, _y, b, _type);
+       
     }
-    public void OnPointerClick(PointerEventData eventData) {
-        board.OnCellClicked(x, y, type);
+    public void OnPointerClick(PointerEventData e)
+    {
+        if (board != null) board.UseActiveAbilityOn(gp);
     }
 }

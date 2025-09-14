@@ -1,2 +1,27 @@
 fileFormatVersion: 2
 guid: 9587f09c253a375469115a5da20c3dd9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - board: {instanceID: 0}
+  - bank: {instanceID: 0}
+  - btnBlue: {instanceID: 0}
+  - btnRed: {instanceID: 0}
+  - btnPink: {instanceID: 0}
+  - btnGreen: {instanceID: 0}
+  - WaterAbility: {fileID: 11400000, guid: 345b41e7d72025f49b2a1431ada6e89c, type: 2}
+  - EarthAbility: {fileID: 11400000, guid: eb2e10cac34b98a4999872575766413f, type: 2}
+  - SunAbility: {fileID: 11400000, guid: a769f90f77fe1e245bfa71e33a8cffc2, type: 2}
+  - GrassAbility: {fileID: 11400000, guid: 46056c7c76aab6e4787c06d8b409f49f, type: 2}
+  - infoPanel: {instanceID: 0}
+  - titleText: {instanceID: 0}
+  - costText: {instanceID: 0}
+  - effectText: {instanceID: 0}
+  - buyButton: {instanceID: 0}
+  - closeButton: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

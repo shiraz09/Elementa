@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f699091f512128845856482fe17b4385, type: 3}
+  m_Name: Bomb3x3Ability
+  m_EditorClassIdentifier: Assembly-CSharp::Bomb3x3Ability
+  title: Grass Flower
+  description: 
+  icon: {fileID: -2158441306721915952, guid: d6664d8f23fbaf243b8dcb7893e37011, type: 3}
+  price:
+    water: 10
+    sun: 10
+    earth: 15
+    grass: 20

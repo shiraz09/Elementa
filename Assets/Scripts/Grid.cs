@@ -10,6 +10,7 @@ public class Grid : MonoBehaviour
     // Types of pieces
     public enum PieceType { EARTH, GRASS, WATER, SUN };
     public ResourceManagement bank;
+    public BoardAbility activeAbility;
 
     // Pair each type with its prefab
     [System.Serializable]
@@ -104,7 +105,7 @@ public class Grid : MonoBehaviour
         {
             foreach (var p in startMatches)
             {
-                if (p != null) RemoveAt(p.X, p.Y,true);
+                if (p != null) RemoveAt(p.X, p.Y, true);
             }
             yield return new WaitForSeconds(0.05f);
             yield return StartCoroutine(FillAndResolve());
@@ -164,8 +165,8 @@ public class Grid : MonoBehaviour
 
     public Vector2 GetUIPos(int x, int y)
     {
-       
-        int yFlip = (yDim - 1) - y;  
+
+        int yFlip = (yDim - 1) - y;
 
         return new Vector2(
             (x * cellSize) - (cellSize * xDim / 2f) + (cellSize / 2f),
@@ -191,9 +192,14 @@ public class Grid : MonoBehaviour
         return (piece1.X == piece2.X && (int)Mathf.Abs(piece1.Y - piece2.Y) == 1) ||
                (piece1.Y == piece2.Y && (int)Mathf.Abs(piece1.X - piece2.X) == 1);
     }
-    
+
     public void PressPiece(GamePiece piece)
     {
+            if (activeAbility != null)
+            {
+                UseActiveAbilityOn(piece);
+                return;
+            }
         pressedPiece = piece;
     }
     public void EnterPiece(GamePiece piece)
@@ -280,63 +286,63 @@ public class Grid : MonoBehaviour
         return null;
 
     }
-    private void RemoveAt(int x, int y, bool awardResource= false)
+    private void RemoveAt(int x, int y, bool awardResource = false)
     {
         GamePiece piece = pieces[x, y];
         if (piece != null)
         {
             if (awardResource && bank != null)
-                bank.Add(piece.Type,1);
-        
-        
+                bank.Add(piece.Type, 1);
+
+
             Destroy(piece.gameObject);
             pieces[x, y] = null;
         }
-        
+
 
     }
-   public void SwapPieces(GamePiece firstPiece, GamePiece secondPiece)
+    public void SwapPieces(GamePiece firstPiece, GamePiece secondPiece)
     {
-    if (firstPiece == null || secondPiece == null) return;
-    if (!firstPiece.IsMoveable() || !secondPiece.IsMoveable()) return;
-    if (!IsAdjacent(firstPiece, secondPiece)) return;
+        if (firstPiece == null || secondPiece == null) return;
+        if (!firstPiece.IsMoveable() || !secondPiece.IsMoveable()) return;
+        if (!IsAdjacent(firstPiece, secondPiece)) return;
 
-    int firstX = firstPiece.X;
-    int firstY = firstPiece.Y;
-    int secondX = secondPiece.X;
-    int secondY = secondPiece.Y;
+        int firstX = firstPiece.X;
+        int firstY = firstPiece.Y;
+        int secondX = secondPiece.X;
+        int secondY = secondPiece.Y;
 
-    // עדכון במערך + אנימציית מעבר
-    pieces[firstX, firstY] = secondPiece;
-    firstPiece.MoveableComponent.Move(secondX, secondY);
+        // עדכון במערך + אנימציית מעבר
+        pieces[firstX, firstY] = secondPiece;
+        firstPiece.MoveableComponent.Move(secondX, secondY);
 
-    pieces[secondX, secondY] = firstPiece;
-    secondPiece.MoveableComponent.Move(firstX, firstY);
+        pieces[secondX, secondY] = firstPiece;
+        secondPiece.MoveableComponent.Move(firstX, firstY);
 
-    // בדיקת מאצ'ים שנוצרו
-    List<GamePiece> matchForFirst = GetMatch(firstPiece, secondX, secondY);
-    List<GamePiece> matchForSecond = GetMatch(secondPiece, firstX, firstY);
+        // בדיקת מאצ'ים שנוצרו
+        List<GamePiece> matchForFirst = GetMatch(firstPiece, secondX, secondY);
+        List<GamePiece> matchForSecond = GetMatch(secondPiece, firstX, firstY);
 
-    HashSet<GamePiece> piecesToClear = new HashSet<GamePiece>();
-    if (matchForFirst != null) { for (int i = 0; i < matchForFirst.Count; i++) piecesToClear.Add(matchForFirst[i]); }
-    if (matchForSecond != null) { for (int i = 0; i < matchForSecond.Count; i++) piecesToClear.Add(matchForSecond[i]); }
+        HashSet<GamePiece> piecesToClear = new HashSet<GamePiece>();
+        if (matchForFirst != null) { for (int i = 0; i < matchForFirst.Count; i++) piecesToClear.Add(matchForFirst[i]); }
+        if (matchForSecond != null) { for (int i = 0; i < matchForSecond.Count; i++) piecesToClear.Add(matchForSecond[i]); }
 
-    // אין מאץ' -> מחזירים לאחור
-    if (piecesToClear.Count < 3)
-    {
-        pieces[firstX, firstY] = firstPiece;
-        firstPiece.MoveableComponent.Move(firstX, firstY);
+        // אין מאץ' -> מחזירים לאחור
+        if (piecesToClear.Count < 3)
+        {
+            pieces[firstX, firstY] = firstPiece;
+            firstPiece.MoveableComponent.Move(firstX, firstY);
 
-        pieces[secondX, secondY] = secondPiece;
-        secondPiece.MoveableComponent.Move(secondX, secondY);
-        return;
-    }
+            pieces[secondX, secondY] = secondPiece;
+            secondPiece.MoveableComponent.Move(secondX, secondY);
+            return;
+        }
 
-    // יש מאץ' -> נקה את כל המאצים בלוח ואח"כ קסקדה
-    if (ClearAllValidMatches())
-    {
-        StartCoroutine(FillAndResolve());
-    }
+        // יש מאץ' -> נקה את כל המאצים בלוח ואח"כ קסקדה
+        if (ClearAllValidMatches())
+        {
+            StartCoroutine(FillAndResolve());
+        }
     }
     private HashSet<GamePiece> FindAllMatchesOnBoard()
     {
@@ -372,7 +378,7 @@ public class Grid : MonoBehaviour
         {
             foreach (GamePiece p in more)
             {
-                if (p != null) RemoveAt(p.X, p.Y,true);
+                if (p != null) RemoveAt(p.X, p.Y, true);
             }
 
             // Run another cascade cycle
@@ -382,37 +388,26 @@ public class Grid : MonoBehaviour
     }
     public enum TargetMode { None, Row, Column, Cell3x3, AllOfType }
     private TargetMode pendingMode = TargetMode.None;
-    public void EnterTargetMode(TargetMode mode){
-        pendingMode = mode;
-    }
-    public void OnCellClicked(int x, int y, PieceType t)
+    public void EnterAbility(BoardAbility ability)
     {
-        if (pendingMode == TargetMode.None) return;
-        switch (pendingMode)
-        {
-            case TargetMode.Row:
-                ClearRow(y);
-                break;
-            case TargetMode.Column:
-                ClearColumn(x);
-                break;
-            case TargetMode.Cell3x3:
-                Bomb3x3(x, y);
-                break;
-            case TargetMode.AllOfType:
-                ClearAllOfType(t);
-                break;
-        }
-        pendingMode = TargetMode.None;
-        StartCoroutine(FillAndResolve());  
+        activeAbility = ability;
     }
-    public void ClearRow(int y) {
+    public void UseActiveAbilityOn(GamePiece piece)
+    {
+        if (activeAbility == null || piece == null) return;
+        activeAbility.Apply(this, piece.X, piece.Y, piece.Type);
+        activeAbility = null;
+        StartCoroutine(FillAndResolve());
+    }
+
+    public void ClearRow(int y)
+    {
         if (y < 0 || y >= yDim) return; // Invalid row
         for (int x = 0; x < xDim; x++)
         {
             if (pieces[x, y] != null)
             {
-                RemoveAt(x, y, false); 
+                RemoveAt(x, y, false);
             }
         }
     }
@@ -423,12 +418,13 @@ public class Grid : MonoBehaviour
         {
             if (pieces[x, y] != null)
             {
-                RemoveAt(x, y, false); 
+                RemoveAt(x, y, false);
             }
         }
     }
 
-    public void ClearAllOfType(PieceType type) {
+    public void ClearAllOfType(PieceType type)
+    {
         for (int x = 0; x < xDim; x++)
         {
             for (int y = 0; y < yDim; y++)
@@ -436,11 +432,11 @@ public class Grid : MonoBehaviour
                 GamePiece piece = pieces[x, y];
                 if (piece != null && piece.Type == type)
                     RemoveAt(x, y, false);  // no resource award
-        
+
             }
         }
     }
-    
+
     public bool ClearAllValidMatches()
     {
         bool needsRefill = false;
@@ -468,23 +464,33 @@ public class Grid : MonoBehaviour
 
         for (int i = 0; i < toClearArray.Length; i++)
         {
-        GamePiece gp = toClearArray[i];
-        if (gp != null)
-        {
-            RemoveAt(gp.X, gp.Y, true); // true => add resource to bank
-            needsRefill = true;
-        }
+            GamePiece gp = toClearArray[i];
+            if (gp != null)
+            {
+                RemoveAt(gp.X, gp.Y, true); // true => add resource to bank
+                needsRefill = true;
+            }
         }
 
         return needsRefill;
     }
     public void Bomb3x3(int centerX, int centerY)
     {
-
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                int x = centerX + dx, y = centerY + dy;
+                if (x >= 0 && x < xDim && y >= 0 && y < yDim && pieces[x, y] != null)
+                    RemoveAt(x, y, false);
+            }
     }
+}
+
+    
+    
     
         
         
-}
+
 
     

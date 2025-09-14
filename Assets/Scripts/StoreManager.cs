@@ -8,6 +8,11 @@ public class StoreManager : MonoBehaviour
     public ResourceManagement bank;
     public enum PieceType { WATER, SUN, EARTH, GRASS };
     public Button btnBlue, btnRed, btnPink, btnGreen;
+    public BoardAbility WaterAbility;
+    public BoardAbility EarthAbility;
+    public BoardAbility SunAbility;
+    public BoardAbility GrassAbility;
+    BoardAbility current;
 
     public GameObject infoPanel;
     public TMP_Text titleText, costText, effectText;
@@ -19,52 +24,63 @@ public class StoreManager : MonoBehaviour
     {
         public string title;
         public Cost price;
-        public Grid.TargetMode mode;
+        public BoardAbility ability;
         public string description;
     }
-    public FlowerDef current;
-    public FlowerDef Blue() => new FlowerDef
+    public FlowerDef WaterFlower() => new FlowerDef
     {
-        title = "Blue Flower",
-        price = new Cost { water = 10 },
-        mode = Grid.TargetMode.Row,
+        title = "Water Flower",
+        price = new Cost { water = 20 },
+        ability=WaterAbility,
         description = "Clears a row"
     };
-    public FlowerDef Red() => new FlowerDef
+    public FlowerDef EarthFlower() => new FlowerDef
     {
-        title = "Red Flower",
-        price = new Cost { earth = 3, water = 1, sun = 1 },
-        mode = Grid.TargetMode.Column,
+        title = "Earth Flower",
+        price = new Cost { earth = 16, water = 4, sun = 8 },
+        ability=EarthAbility,
         description = "Clears a column"
     };
-    public FlowerDef Pink() => new FlowerDef
+    public FlowerDef SunFlower() => new FlowerDef
     {
-        title = "Pink Flower",
-        price = new Cost { water = 3, sun = 3, grass = 3, earth = 3 },
-        mode = Grid.TargetMode.AllOfType,
+        title = "Sun Flower",
+        price = new Cost { water = 3, sun = 25, grass = 7, earth = 3 },
+        ability=SunAbility,
         description = "Clears all of one type"
     };
-    public FlowerDef Green() => new FlowerDef
+    public FlowerDef GrassFlower() => new FlowerDef
     {
-        title = "Green Flower",
-        price = new Cost { grass = 2, water = 2, sun = 2 },
-        mode = Grid.TargetMode.Cell3x3,
+        title = "Grass Flower",
+        price = new Cost { grass = 20, water = 10, sun = 10, earth = 15 },
+        ability=GrassAbility,
         description = "Clears a 3x3 area"
     };
 
 
     void Awake()
     {
-        infoOriginalParent = infoPanel.transform.parent;
-
-        if (btnBlue != null) btnBlue.onClick.AddListener(() => ShowInfo(Blue(), (RectTransform)btnBlue.transform));
-        if (btnRed != null) btnRed.onClick.AddListener(() => ShowInfo(Red(), (RectTransform)btnRed.transform));
-        if (btnPink != null) btnPink.onClick.AddListener(() => ShowInfo(Pink(), (RectTransform)btnPink.transform));
-        if (btnGreen != null) btnGreen.onClick.AddListener(() => ShowInfo(Green(), (RectTransform)btnGreen.transform));
-
+        if (infoPanel)
+        {
+            infoOriginalParent = infoPanel.transform.parent;
+            infoPanel.SetActive(false);
+        }
         if (closeButton) closeButton.onClick.AddListener(CloseInfo);
-        if (infoPanel) infoPanel.SetActive(false);
+
+        if (btnBlue)  btnBlue.onClick.AddListener(() =>
+            ShowInfo(WaterAbility,  (RectTransform)btnBlue.transform));
+        if (btnRed)   btnRed.onClick.AddListener(() =>
+            ShowInfo(EarthAbility,   (RectTransform)btnRed.transform));
+        if (btnPink)  btnPink.onClick.AddListener(() =>
+            ShowInfo(SunAbility,  (RectTransform)btnPink.transform));
+        if (btnGreen) btnGreen.onClick.AddListener(() =>
+            ShowInfo(GrassAbility, (RectTransform)btnGreen.transform));
+        
         //if (overlay) overlay.SetActive(false);
+        if (bank) bank.OnChanged += RefreshAllItems;
+        RefreshAllItems();
+    }
+    void OnEnable()
+    {
         if (bank) bank.OnChanged += RefreshAllItems;
         RefreshAllItems();
     }
@@ -72,41 +88,19 @@ public class StoreManager : MonoBehaviour
     {
         if (bank) bank.OnChanged -= RefreshAllItems;
     }
-    public void ShowInfo(FlowerDef def, RectTransform anchor = null,int qty = 1)
+    public void ShowInfo(BoardAbility ab, RectTransform anchor = null, int qty = 1)
     {
-        if (!infoPanel) return;
-
-        titleText.text = def.title;
-        costText.text = FormatCost(def.price, qty);
-        effectText.text = def.description;
-
+        if (!ab || !infoPanel) return;
+        current = ab;
+        titleText.text  = ab.title;
+        effectText.text = ab.description;
+        costText.text   = FormatCost(Cost.Multiply(ab.price, qty));
 
         if (buyButton)
         {
             buyButton.onClick.RemoveAllListeners();
-            buyButton.onClick.AddListener(() => TryBuy(def));
-            buyButton.interactable = bank ? bank.Has(def.price) : false;
-        }
-        var panelRT = (RectTransform)infoPanel.transform;
-        panelRT.SetParent(infoOriginalParent, false);
-        if (!showAsModal && anchor != null)
-        {
-            Vector2 localPoint;
-            RectTransform parentRT = (RectTransform)infoOriginalParent;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            parentRT,
-            RectTransformUtility.WorldToScreenPoint(null, anchor.position),
-            null,
-            out localPoint);
-            panelRT.pivot = new Vector2(0.5f, 0f);     // תחתית הפאנל תהיה ליד העוגן
-            panelRT.anchorMin = panelRT.anchorMax = new Vector2(0.5f, 0.5f);
-            panelRT.anchoredPosition = localPoint + new Vector2(0f, 120f);
-        }
-        else
-        {
-            panelRT.pivot = new Vector2(0.5f, 0.5f);
-            panelRT.anchorMin = panelRT.anchorMax = new Vector2(0.5f, 0.5f);
-            panelRT.anchoredPosition = Vector2.zero;
+            buyButton.onClick.AddListener(() => TryBuy(ab, qty));
+            buyButton.interactable = (bank != null) && bank.Has(Cost.Multiply(ab.price, qty));
         }
         infoPanel.SetActive(true);
     }
@@ -118,22 +112,16 @@ public class StoreManager : MonoBehaviour
         //overlay.SetActive(false);
     }
 
-    public void TryBuy(FlowerDef def,int qty = 1)
+    public void TryBuy(BoardAbility ab, int qty = 1)
     {
-        if (def == null || bank == null || board == null) return;
-        var total = Cost.Multiply(def.price, qty);
-
-        if (!bank.Spend(total))
-        {
-            Debug.Log("Not enough resources");
-            return;
-        }
-        board.EnterTargetMode(def.mode);
+        if (!ab || !bank || !board) return;
+        var total = Cost.Multiply(ab.price, qty);
+        if (!bank.Spend(total)) { Debug.Log("Not enough resources"); return; }
+        board.EnterAbility(ab);
         infoPanel.SetActive(false);
-        CloseInfo();
     }
 
-    public enum FlowerKind { Blue, Red, Pink, Green }
+    public enum FlowerKind { WaterFlower, EarthFlower, SunFlower, GrassFlower }
     public string FormatCost(Cost c) {
     string s = "";
     if (c.water > 0) s += $"{c.water} ";
@@ -147,10 +135,10 @@ public class StoreManager : MonoBehaviour
     {
         var t = Cost.Multiply(c, qty);
         string s = "";
-        if (c.water > 0) s += $"{c.water}  ";
-        if (c.sun > 0) s += $"{c.sun} ";
-        if (c.earth > 0) s += $"{c.earth}  ";
-        if (c.grass > 0) s += $"{c.grass}  ";
+        if (t.water > 0) s += $"{t.water}  ";
+        if (t.sun > 0) s += $"{t.sun} ";
+        if (t.earth > 0) s += $"{t.earth}  ";
+        if (t.grass > 0) s += $"{t.grass}  ";
         return string.IsNullOrEmpty(s) ? "Free" : s.Trim();
     }
 
@@ -158,11 +146,11 @@ public class StoreManager : MonoBehaviour
     {
         switch (k)
         {
-            case FlowerKind.Blue: return Blue();
-            case FlowerKind.Red: return Red();
-            case FlowerKind.Pink: return Pink();
-            case FlowerKind.Green: return Green();
-            default: return Blue();
+            case FlowerKind.WaterFlower: return WaterFlower();
+            case FlowerKind.EarthFlower: return EarthFlower();
+            case FlowerKind.SunFlower: return SunFlower();
+            case FlowerKind.GrassFlower: return GrassFlower();
+            default: return WaterFlower();
 
         }
     }
