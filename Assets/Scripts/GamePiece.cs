@@ -6,6 +6,7 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerEnterHandle
 {
     private int x;
     private int y;
+    public int score;
     private Grid.PieceType type;
     private Grid grid;
     private MoveablePiece moveableComponent;
@@ -85,6 +86,10 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerEnterHandle
 
     public bool IsMoveable()
     {
+        // מכשולים לא ניתנים להזזה
+        if (type == Grid.PieceType.ICEOBS || type == Grid.PieceType.GRASSOBS)
+            return false;
+            
         return moveableComponent != null;
     }
     public bool IsColored()

@@ -55,6 +55,11 @@ public class ResourceManagement : MonoBehaviour
             case Grid.PieceType.GRASS:
                 grass += amount;
                 break;
+            // מכשולים לא נותנים משאבים
+            case Grid.PieceType.ICEOBS:
+            case Grid.PieceType.GRASSOBS:
+                // לא עושים כלום
+                break;
         }
         UpdateUI();
     }
