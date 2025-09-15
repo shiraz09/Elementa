@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2651886831584042662}
   - component: {fileID: 3180424427765889942}
   - component: {fileID: 113315349512335895}
+  - component: {fileID: 2104625919190559719}
   m_Layer: 5
   m_Name: iceobs
   m_TagString: Untagged
@@ -75,3 +76,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2104625919190559719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7115646594343117723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65019ea3bc85844dfb5f531290fccd2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObstaclePiece
+  kind: 1
+  hitsToClear: 6
+  stageSprites:
+  - {fileID: 21300000, guid: d3394f620ff35cd4f9537852ce50a0a6, type: 3}
+  - {fileID: 21300000, guid: 4205cebc9093bb741a617788998c1476, type: 3}

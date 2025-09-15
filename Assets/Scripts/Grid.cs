@@ -74,8 +74,6 @@ public class Grid : MonoBehaviour
     private bool gameOver = false;
 
     // ————————————————————— Lifecycle —————————————————————
-
-    // Initializes board, backgrounds, random pieces, obstacles, and level values
     void Start()
     {
         // Build prefab dict
@@ -138,8 +136,6 @@ public class Grid : MonoBehaviour
     }
 
     // ————————————————————— Helpers —————————————————————
-
-    // Returns a random non-obstacle type
     private PieceType GetRandomType()
     {
         if (availableTypes == null || availableTypes.Length == 0)
@@ -156,7 +152,6 @@ public class Grid : MonoBehaviour
         return regular[Random.Range(0, regular.Count)];
     }
 
-    // Returns a random obstacle type
     private PieceType GetRandomObstacleType()
     {
         PieceType[] obs = { PieceType.ICEOBS, PieceType.GRASSOBS };
@@ -164,8 +159,6 @@ public class Grid : MonoBehaviour
     }
 
     // ————————————————————— Obstacles —————————————————————
-
-    // Spawns random obstacles across the board
     private void SpawnRandomObstacles()
     {
         int spawned = 0;
@@ -176,7 +169,6 @@ public class Grid : MonoBehaviour
                 if (spawned >= maxObstacles) break;
                 if (Random.Range(0f, 1f) < obstacleSpawnChance)
                 {
-                    // Replace current piece with obstacle
                     SpawnObstacleAt(x, y, GetRandomObstacleType());
                     spawned++;
                 }
@@ -186,7 +178,6 @@ public class Grid : MonoBehaviour
         Debug.Log($"Spawned {spawned} obstacles.");
     }
 
-    // Spawns a given obstacle at cell (replacing any piece)
     public void SpawnObstacleAt(int x, int y, PieceType obstacleType)
     {
         if (x < 0 || x >= xDim || y < 0 || y >= yDim) return;
@@ -195,10 +186,25 @@ public class Grid : MonoBehaviour
         if (pieces[x, y] != null)
             RemoveAt(x, y, false);
 
-        SpawnNewPiece(x, y, obstacleType);
+        GamePiece gp = SpawnNewPiece(x, y, obstacleType);
+
+        // make sure the obstacle has ObstaclePiece configured
+        var ob = gp.GetComponent<ObstaclePiece>();
+        if (ob == null) ob = gp.gameObject.AddComponent<ObstaclePiece>();
+
+        if (obstacleType == PieceType.GRASSOBS)
+        {
+            ob.kind = ObstaclePiece.Kind.Grass;
+            ob.hitsToClear = 3; // 3 שלבים של תמונה + היעלמות בפגיעה הרביעית
+        }
+        else
+        {
+            ob.kind = ObstaclePiece.Kind.Ice;
+            ob.hitsToClear = 6; // מתחלף כל 2 פגיעות, נעלם ב-6
+        }
     }
 
-    // Removes obstacle at cell
+    // legacy direct remove (עדיין נשמר לצרכים מיוחדים)
     public void RemoveObstacleAt(int x, int y)
     {
         GamePiece p = pieces[x, y];
@@ -209,7 +215,29 @@ public class Grid : MonoBehaviour
         }
     }
 
-    // Returns count of obstacles on board
+    // Apply damage to obstacle; returns true if destroyed
+    public bool DamageObstacleAt(int x, int y, int amount = 1)
+    {
+        GamePiece p = pieces[x, y];
+        if (p == null) return false;
+
+        if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
+        {
+            var ob = p.GetComponent<ObstaclePiece>();
+            if (ob != null)
+            {
+                bool destroyed = ob.Damage(amount);
+                if (destroyed)
+                {
+                    Destroy(p.gameObject);
+                    pieces[x, y] = null;
+                }
+                return destroyed;
+            }
+        }
+        return false;
+    }
+
     public int GetObstacleCount()
     {
         int count = 0;
@@ -224,8 +252,6 @@ public class Grid : MonoBehaviour
     }
 
     // ————————————————————— Level: moves/score/stars —————————————————————
-
-    // Calculates total moves by base + per obstacle
     public void CalculateMovesForLevel()
     {
         int obs = GetObstacleCount();
@@ -234,7 +260,6 @@ public class Grid : MonoBehaviour
         Debug.Log($"Level started with {currentMoves} moves (base {baseMoves}, +{obs}×{movesPerObstacle}).");
     }
 
-    // Spends one move; returns false if no moves left
     public bool UseMove()
     {
         if (currentMoves <= 0) return false;
@@ -253,7 +278,6 @@ public class Grid : MonoBehaviour
         return true;
     }
 
-    // Adds score based on match size and triggers star UI
     public void AddMatchScore(int matchSize)
     {
         int add = 0;
@@ -277,7 +301,6 @@ public class Grid : MonoBehaviour
             gameUI?.ShowStarEarnedMessage(newStars);
     }
 
-    // Returns current star rating
     public int GetStarRating()
     {
         if (currentScore >= star3Score) return 3;
@@ -286,7 +309,6 @@ public class Grid : MonoBehaviour
         return 0;
     }
 
-    // Returns target score for next star
     public int GetScoreForNextStar()
     {
         switch (GetStarRating())
@@ -298,7 +320,6 @@ public class Grid : MonoBehaviour
         }
     }
 
-    // Ends the level and notifies listeners
     public void GameOver()
     {
         if (gameOver) return;
@@ -316,8 +337,6 @@ public class Grid : MonoBehaviour
     }
 
     // ————————————————————— Fill / Gravity / Match —————————————————————
-
-    // Runs gravity/refill until stable, then clears initial matches
     public IEnumerator Fill()
     {
         while (FillStep())
@@ -334,7 +353,6 @@ public class Grid : MonoBehaviour
         }
     }
 
-    // Performs one gravity + top spawn step
     public bool FillStep()
     {
         bool moved = false;
@@ -385,7 +403,6 @@ public class Grid : MonoBehaviour
         return moved;
     }
 
-    // UI position (y is flipped so top is smaller y index)
     public Vector2 GetUIPos(int x, int y)
     {
         int yFlip = (yDim - 1) - y;
@@ -395,7 +412,6 @@ public class Grid : MonoBehaviour
         );
     }
 
-    // Spawns a piece at cell
     public GamePiece SpawnNewPiece(int x, int y, PieceType type)
     {
         GameObject go = Instantiate(piecePrefabDict[type]);
@@ -414,14 +430,12 @@ public class Grid : MonoBehaviour
         return gp;
     }
 
-    // Checks orthogonal adjacency
     public bool IsAdjacent(GamePiece a, GamePiece b)
     {
         return (a.X == b.X && Mathf.Abs(a.Y - b.Y) == 1) ||
                (a.Y == b.Y && Mathf.Abs(a.X - b.X) == 1);
     }
 
-    // Pointer down on a piece (uses active ability if set)
     public void PressPiece(GamePiece piece)
     {
         if (activeAbility != null)
@@ -432,14 +446,12 @@ public class Grid : MonoBehaviour
         pressedPiece = piece;
     }
 
-    // Pointer enters neighboring piece while dragging
     public void EnterPiece(GamePiece piece)
     {
         if (pressedPiece != null && piece != pressedPiece)
             enteredPiece = piece;
     }
 
-    // Pointer up → attempt swap
     public void ReleasePiece()
     {
         if (pressedPiece != null && enteredPiece != null && IsAdjacent(pressedPiece, enteredPiece))
@@ -449,7 +461,6 @@ public class Grid : MonoBehaviour
         enteredPiece = null;
     }
 
-    // Finds match list (H/V) around a center (optionally simulating newX/newY)
     public List<GamePiece> GetMatch(GamePiece piece, int newX, int newY)
     {
         if (piece == null) return null;
@@ -503,7 +514,6 @@ public class Grid : MonoBehaviour
         return result.Count >= 3 ? result : null;
     }
 
-    // Removes a piece and optionally awards resources
     private void RemoveAt(int x, int y, bool awardResource = false)
     {
         GamePiece piece = pieces[x, y];
@@ -521,7 +531,6 @@ public class Grid : MonoBehaviour
         }
     }
 
-    // Swaps two pieces, validates match, consumes move, cascades
     public void SwapPieces(GamePiece a, GamePiece b)
     {
         if (gameOver) return;
@@ -564,7 +573,6 @@ public class Grid : MonoBehaviour
             StartCoroutine(FillAndResolve());
     }
 
-    // Returns all pieces that belong to any match
     private HashSet<GamePiece> FindAllMatchesOnBoard()
     {
         HashSet<GamePiece> set = new HashSet<GamePiece>();
@@ -580,7 +588,6 @@ public class Grid : MonoBehaviour
         return set;
     }
 
-    // Cascades: gravity/refill, then keep clearing until stable; finally ensure moves exist
     private IEnumerator FillAndResolve()
     {
         while (FillStep())
@@ -603,18 +610,11 @@ public class Grid : MonoBehaviour
     }
 
     // ————————————————————— Power-ups / Abilities —————————————————————
-
-    public enum TargetMode { None, Row, Column, Cell3x3, AllOfType } // reserved if you need UI target modes
+    public enum TargetMode { None, Row, Column, Cell3x3, AllOfType }
     private TargetMode pendingMode = TargetMode.None;
 
-    // Enters ability mode via scriptable BoardAbility
-    public void EnterAbility(BoardAbility ability)
-    {
-        activeAbility = ability;
-    }
-    
+    public void EnterAbility(BoardAbility ability) { activeAbility = ability; }
 
-    // Uses active ability on a piece
     public void UseActiveAbilityOn(GamePiece piece)
     {
         if (activeAbility == null || piece == null) return;
@@ -623,7 +623,6 @@ public class Grid : MonoBehaviour
         StartCoroutine(FillAndResolve());
     }
 
-    // Clears a row (awards resources for regular pieces)
     public void ClearRow(int y)
     {
         if (y < 0 || y >= yDim) return;
@@ -633,13 +632,12 @@ public class Grid : MonoBehaviour
             if (p == null) continue;
 
             if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
-                RemoveObstacleAt(x, y);
+                DamageObstacleAt(x, y, 1);  // נזק במקום מחיקה
             else
                 RemoveAt(x, y, true);
         }
     }
 
-    // Clears a column (awards resources for regular pieces)
     public void ClearColumn(int x)
     {
         if (x < 0 || x >= xDim) return;
@@ -649,13 +647,12 @@ public class Grid : MonoBehaviour
             if (p == null) continue;
 
             if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
-                RemoveObstacleAt(x, y);
+                DamageObstacleAt(x, y, 1);
             else
                 RemoveAt(x, y, true);
         }
     }
 
-    // Clears all pieces of a type (awards resources for regular pieces)
     public void ClearAllOfType(PieceType type)
     {
         for (int x = 0; x < xDim; x++)
@@ -663,16 +660,12 @@ public class Grid : MonoBehaviour
             {
                 GamePiece p = pieces[x, y];
                 if (p == null) continue;
-                if (p.Type != type) continue;
+                if (p.Type != type) continue; // לא נוגעים במכשולים כאן
 
-                if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
-                    RemoveObstacleAt(x, y);
-                else
-                    RemoveAt(x, y, true);
+                RemoveAt(x, y, true);
             }
     }
 
-    // 3x3 bomb around center
     public void Bomb3x3(int cx, int cy)
     {
         for (int x = cx - 1; x <= cx + 1; x++)
@@ -683,15 +676,13 @@ public class Grid : MonoBehaviour
                     if (p == null) continue;
 
                     if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
-                        RemoveObstacleAt(x, y);
+                        DamageObstacleAt(x, y, 2); // פצצה = נזק כפול
                     else
                         RemoveAt(x, y, true);
                 }
     }
 
     // ————————————————————— Clear / Score / Obstacles synergy —————————————————————
-
-    // Returns obstacles near a match that should be cleared as collateral
     public List<GamePiece> GetObstaclesAffectedByMatch(List<GamePiece> matchPieces)
     {
         List<GamePiece> affected = new List<GamePiece>();
@@ -713,7 +704,6 @@ public class Grid : MonoBehaviour
         return affected;
     }
 
-    // Clears all matches; awards score/resources; returns whether refill is needed
     public bool ClearAllValidMatches()
     {
         bool needsRefill = false;
@@ -752,15 +742,15 @@ public class Grid : MonoBehaviour
             }
         }
 
-        // clear affected obstacles
+        // obstacles near matches -> damage (not instant remove)
         GamePiece[] oarr = new GamePiece[obsToClear.Count];
         obsToClear.CopyTo(oarr);
         foreach (var ob in oarr)
         {
             if (ob != null)
             {
-                RemoveObstacleAt(ob.X, ob.Y);
-                needsRefill = true;
+                bool destroyed = DamageObstacleAt(ob.X, ob.Y, 1);
+                if (destroyed) needsRefill = true;
             }
         }
 
@@ -768,8 +758,6 @@ public class Grid : MonoBehaviour
     }
 
     // ————————————————————— No-move detection / Shuffle —————————————————————
-
-    // Returns true if any swap would produce a match
     public bool HasPossibleMoves()
     {
         for (int x = 0; x < xDim; x++)
@@ -801,7 +789,6 @@ public class Grid : MonoBehaviour
         return false;
     }
 
-    // Shuffles moveable pieces while keeping obstacles
     public void ShuffleBoard()
     {
         Debug.Log("Shuffling board…");
@@ -854,7 +841,6 @@ public class Grid : MonoBehaviour
         }
     }
 
-    // Checks and reshuffles if no moves remain
     public void CheckAndRefreshBoard()
     {
         if (!HasPossibleMoves())
@@ -864,7 +850,6 @@ public class Grid : MonoBehaviour
         }
     }
 
-    // Public hook to trigger manual refresh
     public void ManualRefreshBoard()
     {
         Debug.Log("Manual board refresh requested.");
@@ -872,8 +857,6 @@ public class Grid : MonoBehaviour
     }
 
     // ————————————————————— Periodic check —————————————————————
-
-    // Periodic check coroutine
     private IEnumerator PeriodicMoveCheck()
     {
         while (!gameOver)
@@ -884,13 +867,11 @@ public class Grid : MonoBehaviour
         }
     }
 
-    // Starts periodic checking
     public void StartMoveChecking()
     {
         StartCoroutine(PeriodicMoveCheck());
     }
 
-    // Stops periodic checking (and any other coroutines if you want)
     public void StopMoveChecking()
     {
         StopAllCoroutines();
