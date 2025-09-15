@@ -13,10 +13,7 @@ public class StoreManager : MonoBehaviour
     public BoardAbility SunAbility;
     public BoardAbility GrassAbility;
     BoardAbility current;
-
-    public GameObject infoPanel;
-    public TMP_Text titleText, costText, effectText;
-    public Button buyButton, closeButton;
+    
     public bool showAsModal = false;
     //public GameObject overlay; 
     Transform infoOriginalParent;   // to restore parent on close
@@ -59,22 +56,6 @@ public class StoreManager : MonoBehaviour
 
     void Awake()
     {
-        if (infoPanel)
-        {
-            infoOriginalParent = infoPanel.transform.parent;
-            infoPanel.SetActive(false);
-        }
-        if (closeButton) closeButton.onClick.AddListener(CloseInfo);
-
-        if (btnBlue)  btnBlue.onClick.AddListener(() =>
-            ShowInfo(WaterAbility,  (RectTransform)btnBlue.transform));
-        if (btnRed)   btnRed.onClick.AddListener(() =>
-            ShowInfo(EarthAbility,   (RectTransform)btnRed.transform));
-        if (btnPink)  btnPink.onClick.AddListener(() =>
-            ShowInfo(SunAbility,  (RectTransform)btnPink.transform));
-        if (btnGreen) btnGreen.onClick.AddListener(() =>
-            ShowInfo(GrassAbility, (RectTransform)btnGreen.transform));
-        
         //if (overlay) overlay.SetActive(false);
         if (bank) bank.OnChanged += RefreshAllItems;
         RefreshAllItems();
@@ -88,29 +69,6 @@ public class StoreManager : MonoBehaviour
     {
         if (bank) bank.OnChanged -= RefreshAllItems;
     }
-    public void ShowInfo(BoardAbility ab, RectTransform anchor = null, int qty = 1)
-    {
-        if (!ab || !infoPanel) return;
-        current = ab;
-        titleText.text  = ab.title;
-        effectText.text = ab.description;
-        costText.text   = FormatCost(Cost.Multiply(ab.price, qty));
-
-        if (buyButton)
-        {
-            buyButton.onClick.RemoveAllListeners();
-            buyButton.onClick.AddListener(() => TryBuy(ab, qty));
-            buyButton.interactable = (bank != null) && bank.Has(Cost.Multiply(ab.price, qty));
-        }
-        infoPanel.SetActive(true);
-    }
-    public void CloseInfo()
-    {
-        var panelRT = (RectTransform)infoPanel.transform;
-        panelRT.SetParent(infoOriginalParent, false);
-        infoPanel.SetActive(false);
-        //overlay.SetActive(false);
-    }
 
     public void TryBuy(BoardAbility ab, int qty = 1)
     {
@@ -118,7 +76,6 @@ public class StoreManager : MonoBehaviour
         var total = Cost.Multiply(ab.price, qty);
         if (!bank.Spend(total)) { Debug.Log("Not enough resources"); return; }
         board.EnterAbility(ab);
-        infoPanel.SetActive(false);
     }
 
     public enum FlowerKind { WaterFlower, EarthFlower, SunFlower, GrassFlower }
