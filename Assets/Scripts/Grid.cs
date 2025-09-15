@@ -612,6 +612,7 @@ public class Grid : MonoBehaviour
     {
         activeAbility = ability;
     }
+    
 
     // Uses active ability on a piece
     public void UseActiveAbilityOn(GamePiece piece)

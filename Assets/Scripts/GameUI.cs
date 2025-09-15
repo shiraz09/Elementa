@@ -7,9 +7,12 @@ public class GameUI : MonoBehaviour
     [Header("UI References")]
     public TMP_Text movesText;
     public TMP_Text scoreText;
-    public Image[] starImages;   // exactly 3 Image slots in Inspector
-    public Sprite starFilledSprite; // assign: the "full" star sprite
-    public Sprite starEmptySprite;  // assign: the "empty/gray" star sprite
+
+    // במקום 3 אימג'ים – אימג' בודד שמחליף Sprite לפי מצב
+    public Image starsImage;
+
+    // 4 ספרייטים: [0]=שלושה ריקים, [1]=כוכב אחד, [2]=שניים, [3]=שלושה מלאים
+    public Sprite[] starStates; // size 4 באינספקטור
 
     [Header("Animation Settings")]
     public float starAnimationDuration = 0.5f;
@@ -31,18 +34,10 @@ public class GameUI : MonoBehaviour
             return;
         }
 
-        // sanity: make sure stars are visible and use white color
-        if (starImages != null)
+        if (starsImage != null)
         {
-            for (int i = 0; i < starImages.Length; i++)
-            {
-                if (starImages[i] != null)
-                {
-                    starImages[i].color = Color.white;   // no accidental tint
-                    starImages[i].raycastTarget = false; // שלא יחסום את הלוח
-                    starImages[i].enabled = true;        // make sure it's on
-                }
-            }
+            starsImage.color = Color.white;
+            starsImage.preserveAspect = true;
         }
 
         UpdateUI();
@@ -56,6 +51,7 @@ public class GameUI : MonoBehaviour
     public void UpdateUI()
     {
         if (grid == null) return;
+
         UpdateMovesDisplay();
         UpdateScoreDisplay();
         UpdateStarsDisplay();
@@ -85,32 +81,21 @@ public class GameUI : MonoBehaviour
 
     private void UpdateStarsDisplay()
     {
-        if (starImages == null || starImages.Length != 3) return;
-        if (starFilledSprite == null || starEmptySprite == null)
+        if (starsImage == null) return;
+        if (starStates == null || starStates.Length < 4)
         {
-            Debug.LogWarning("GameUI: Please assign starFilledSprite and starEmptySprite in the Inspector.");
+            Debug.LogWarning("GameUI: Please assign 4 star state sprites (0..3).");
             return;
         }
 
-        int currentStars = grid.GetStarRating(); // 0..3
+        int currentStars = Mathf.Clamp(grid.GetStarRating(), 0, 3);
 
-        for (int i = 0; i < starImages.Length; i++)
-        {
-            var img = starImages[i];
-            if (img == null) continue;
+        // החלפת הספרייט לפי מצב הכוכבים
+        starsImage.sprite = starStates[currentStars];
 
-            // choose the correct sprite
-            img.sprite = (i < currentStars) ? starFilledSprite : starEmptySprite;
-
-            // optional: keep size consistent with the sprite
-            // img.SetNativeSize();
-
-            // play animation exactly when a star was just earned
-            if (i < currentStars && i >= lastStars)
-            {
-                StartCoroutine(AnimateStarEarned(i));
-            }
-        }
+        // אם בדיוק עלינו בדרגה – נאנמת קלות
+        if (currentStars > lastStars)
+            StartCoroutine(AnimateStarEarned());
 
         lastStars = currentStars;
     }
@@ -131,27 +116,24 @@ public class GameUI : MonoBehaviour
         scoreText.color = originalColor;
     }
 
-    private System.Collections.IEnumerator AnimateStarEarned(int starIndex)
+    private System.Collections.IEnumerator AnimateStarEarned()
     {
-        if (starImages == null || starIndex >= starImages.Length) yield break;
-        var starImage = starImages[starIndex];
-        if (starImage == null) yield break;
+        if (starsImage == null) yield break;
 
-        Vector3 originalScale = starImage.transform.localScale;
+        Vector3 originalScale = starsImage.transform.localScale;
 
-        starImage.transform.localScale = originalScale * 1.5f;
+        starsImage.transform.localScale = originalScale * 1.1f;
 
         float elapsed = 0f;
         while (elapsed < starAnimationDuration)
         {
             elapsed += Time.deltaTime;
-            float rotation = (elapsed / starAnimationDuration) * 360f;
-            starImage.transform.rotation = Quaternion.Euler(0, 0, rotation);
+            float t = Mathf.Sin(Mathf.Clamp01(elapsed / starAnimationDuration) * Mathf.PI);
+            starsImage.transform.localScale = Vector3.Lerp(originalScale * 1.1f, originalScale, t);
             yield return null;
         }
 
-        starImage.transform.localScale = originalScale;
-        starImage.transform.rotation = Quaternion.identity;
+        starsImage.transform.localScale = originalScale;
     }
 
     public void ShowStarEarnedMessage(int starCount)
