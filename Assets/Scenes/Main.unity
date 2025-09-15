@@ -654,6 +654,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5085364366977311714, guid: 82f92f96186f67646b985f3cdd6425ec, type: 3}
+      propertyPath: bank
+      value: 
+      objectReference: {fileID: 895136885}
     - target: {fileID: 5788487930763766362, guid: 82f92f96186f67646b985f3cdd6425ec, type: 3}
       propertyPath: m_Name
       value: Board
@@ -713,7 +717,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 75.52942, y: -33.858154}
+  m_AnchoredPosition: {x: 75.5293, y: -33.8584}
   m_SizeDelta: {x: 359.4161, y: 67.7161}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1982428794
@@ -997,6 +1001,10 @@ PrefabInstance:
     - target: {fileID: 6301770661592747877, guid: 2f1bac88086c401439611d312a5c8229, type: 3}
       propertyPath: m_Color.r
       value: 0.21960786
+      objectReference: {fileID: 0}
+    - target: {fileID: 6307016605433982124, guid: 2f1bac88086c401439611d312a5c8229, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -74.0083
       objectReference: {fileID: 0}
     - target: {fileID: 6685833352178665742, guid: 2f1bac88086c401439611d312a5c8229, type: 3}
       propertyPath: m_Color.a
