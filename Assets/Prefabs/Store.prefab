@@ -201,6 +201,10 @@ MonoBehaviour:
   PriceContainer: {fileID: 3126430017050354322}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
+  mainCanvas: {fileID: 0}
+  dragIconPrefab: {fileID: 4305543939820871810, guid: 591460a23a5b86044a0fe14a26a5a72a, type: 3}
+  abilityIconSprite: {fileID: 1532440346177022758, guid: 171733e5910488f40b37633af0905a6e, type: 3}
+  raycaster: {fileID: 0}
 --- !u!1 &1753949567414843807
 GameObject:
   m_ObjectHideFlags: 0
@@ -462,6 +466,10 @@ MonoBehaviour:
   PriceContainer: {fileID: 9127545924359671896}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
+  mainCanvas: {fileID: 0}
+  dragIconPrefab: {fileID: 4305543939820871810, guid: 591460a23a5b86044a0fe14a26a5a72a, type: 3}
+  abilityIconSprite: {fileID: 6626051464634953487, guid: e45838b8df68d174f93bb60ac7c2a6b8, type: 3}
+  raycaster: {fileID: 0}
 --- !u!1 &2047826306039147150
 GameObject:
   m_ObjectHideFlags: 0
@@ -692,7 +700,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -2, y: -24.446808}
+  m_AnchoredPosition: {x: -2, y: -24.446777}
   m_SizeDelta: {x: 1050.0338, y: 557.9214}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3277980846293786172
@@ -979,6 +987,10 @@ MonoBehaviour:
   PriceContainer: {fileID: 6842422879332715951}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
+  mainCanvas: {fileID: 0}
+  dragIconPrefab: {fileID: 4305543939820871810, guid: 591460a23a5b86044a0fe14a26a5a72a, type: 3}
+  abilityIconSprite: {fileID: -2158441306721915952, guid: d6664d8f23fbaf243b8dcb7893e37011, type: 3}
+  raycaster: {fileID: 0}
 --- !u!1 &4722278593013593060
 GameObject:
   m_ObjectHideFlags: 0
@@ -1949,6 +1961,10 @@ MonoBehaviour:
   PriceContainer: {fileID: 4575997105058783847}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 0.9803922, b: 0.9803922, a: 0.34901962}
+  mainCanvas: {fileID: 0}
+  dragIconPrefab: {fileID: 4305543939820871810, guid: 591460a23a5b86044a0fe14a26a5a72a, type: 3}
+  abilityIconSprite: {fileID: -7097860344766265739, guid: 3c68d69ac56e1dc49956a623e6045af3, type: 3}
+  raycaster: {fileID: 0}
 --- !u!1 &8746721094438287379
 GameObject:
   m_ObjectHideFlags: 0
