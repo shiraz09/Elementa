@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +9,12 @@ public class StoreManager : MonoBehaviour
     public ResourceManagement bank;
     FlowerAbility current;
     
-    public bool showAsModal = false;
+    public Sprite WaterResourceIcon; 
+    public Sprite SunResourceIcon;
+    public Sprite EarthResourceIcon;
+    public Sprite GrassResourceIcon;
+    public GameObject ResourceAmountPrefab;
+    
     //public GameObject overlay; 
     Transform infoOriginalParent;   // to restore parent on close
 
@@ -34,27 +40,6 @@ public class StoreManager : MonoBehaviour
         var total = Cost.Multiply(ab.price, qty);
         if (!bank.Spend(total)) { Debug.Log("Not enough resources"); return; }
         board.EnterAbility(ab);
-    }
-
-    public enum FlowerKind { WaterFlower, EarthFlower, SunFlower, GrassFlower }
-    public string FormatCost(Cost c) {
-    string s = "";
-    if (c.water > 0) s += $"{c.water} ";
-    if (c.sun   > 0) s += $"{c.sun} ";
-    if (c.earth > 0) s += $"{c.earth} ";
-    if (c.grass > 0) s += $"{c.grass} ";
-    return string.IsNullOrEmpty(s) ? "Free" : s.Trim();
-}
-
-    public string FormatCost(Cost c, int qty = 1)
-    {
-        var t = Cost.Multiply(c, qty);
-        string s = "";
-        if (t.water > 0) s += $"{t.water}  ";
-        if (t.sun > 0) s += $"{t.sun} ";
-        if (t.earth > 0) s += $"{t.earth}  ";
-        if (t.grass > 0) s += $"{t.grass}  ";
-        return string.IsNullOrEmpty(s) ? "Free" : s.Trim();
     }
     
      public void RefreshAllItems()
