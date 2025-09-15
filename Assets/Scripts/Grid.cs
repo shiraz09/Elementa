@@ -204,16 +204,7 @@ public class Grid : MonoBehaviour
         }
     }
 
-    // legacy direct remove (עדיין נשמר לצרכים מיוחדים)
-    public void RemoveObstacleAt(int x, int y)
-    {
-        GamePiece p = pieces[x, y];
-        if (p != null && (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS))
-        {
-            Destroy(p.gameObject);
-            pieces[x, y] = null;
-        }
-    }
+
 
     // Apply damage to obstacle; returns true if destroyed
     public bool DamageObstacleAt(int x, int y, int amount = 1)
@@ -229,6 +220,7 @@ public class Grid : MonoBehaviour
                 bool destroyed = ob.Damage(amount);
                 if (destroyed)
                 {
+                    ob.KillTweens();     // ← חדש
                     Destroy(p.gameObject);
                     pieces[x, y] = null;
                 }
@@ -236,6 +228,18 @@ public class Grid : MonoBehaviour
             }
         }
         return false;
+    }
+
+    public void RemoveObstacleAt(int x, int y)
+    {
+        GamePiece p = pieces[x, y];
+        if (p != null && (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS))
+        {
+            var ob = p.GetComponent<ObstaclePiece>();
+            if (ob != null) ob.KillTweens(); // ← חדש
+            Destroy(p.gameObject);
+            pieces[x, y] = null;
+        }
     }
 
     public int GetObstacleCount()
@@ -525,7 +529,7 @@ public class Grid : MonoBehaviour
             {
                 bank.Add(piece.Type, 1);
             }
-
+            piece.MoveableComponent?.KillTweens();
             Destroy(piece.gameObject);
             pieces[x, y] = null;
         }
