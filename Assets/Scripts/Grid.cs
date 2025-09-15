@@ -12,7 +12,7 @@ public class Grid : MonoBehaviour
     public ResourceManagement bank;
     public Level level;           // optional, for OnMove / completion callbacks
     public GameUI gameUI;         // optional, for UI updates
-    public BoardAbility activeAbility;
+    public FlowerAbility activeAbility;
 
     [System.Serializable]
     public struct PiecePrefab
@@ -613,12 +613,12 @@ public class Grid : MonoBehaviour
     public enum TargetMode { None, Row, Column, Cell3x3, AllOfType }
     private TargetMode pendingMode = TargetMode.None;
 
-    public void EnterAbility(BoardAbility ability) { activeAbility = ability; }
+    public void EnterAbility(FlowerAbility ability) { activeAbility = ability; }
 
     public void UseActiveAbilityOn(GamePiece piece)
     {
         if (activeAbility == null || piece == null) return;
-        activeAbility.Apply(this, piece.X, piece.Y, piece.Type);
+        FlowerAbility.AbilityMap[activeAbility.ability].Apply(this, piece.X, piece.Y, piece.Type);
         activeAbility = null;
         StartCoroutine(FillAndResolve());
     }

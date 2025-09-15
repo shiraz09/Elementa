@@ -211,14 +211,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StoreItem
   store: {fileID: 2880043505621028967}
-  ability: {fileID: 11400000, guid: a769f90f77fe1e245bfa71e33a8cffc2, type: 2}
+  ability: {fileID: 11400000, guid: b801b3be9cedde54c8e35eef1bfa1677, type: 2}
   iconButton: {fileID: 2060229136528355259}
   iconImage: {fileID: 360311360138456660}
-  titleLabel: {fileID: 0}
-  priceLabel: {fileID: 0}
-  effectPreviewLabel: {fileID: 0}
-  infoButton: {fileID: 0}
-  buyButtonInCard: {fileID: 0}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
 --- !u!1 &1753949567414843807
@@ -475,14 +470,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StoreItem
   store: {fileID: 2880043505621028967}
-  ability: {fileID: 11400000, guid: eb2e10cac34b98a4999872575766413f, type: 2}
+  ability: {fileID: 11400000, guid: 2b7f4bb3c1f3f094aa6c380b4eb9672d, type: 2}
   iconButton: {fileID: 469390501732148915}
   iconImage: {fileID: 9220253478875053135}
-  titleLabel: {fileID: 0}
-  priceLabel: {fileID: 0}
-  effectPreviewLabel: {fileID: 0}
-  infoButton: {fileID: 0}
-  buyButtonInCard: {fileID: 0}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
 --- !u!1 &2448606341247359284
@@ -875,14 +865,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StoreItem
   store: {fileID: 2880043505621028967}
-  ability: {fileID: 11400000, guid: 46056c7c76aab6e4787c06d8b409f49f, type: 2}
+  ability: {fileID: 11400000, guid: 9eac99fb9bddafc428dfdd7864e4d22d, type: 2}
   iconButton: {fileID: 6328291199385867169}
   iconImage: {fileID: 207821938715966127}
-  titleLabel: {fileID: 0}
-  priceLabel: {fileID: 0}
-  effectPreviewLabel: {fileID: 0}
-  infoButton: {fileID: 0}
-  buyButtonInCard: {fileID: 0}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 1, b: 1, a: 0.35}
 --- !u!1 &4722278593013593060
@@ -1263,12 +1248,6 @@ MonoBehaviour:
   EarthAbility: {fileID: 11400000, guid: eb2e10cac34b98a4999872575766413f, type: 2}
   SunAbility: {fileID: 11400000, guid: a769f90f77fe1e245bfa71e33a8cffc2, type: 2}
   GrassAbility: {fileID: 11400000, guid: 46056c7c76aab6e4787c06d8b409f49f, type: 2}
-  infoPanel: {fileID: 0}
-  titleText: {fileID: 0}
-  costText: {fileID: 0}
-  effectText: {fileID: 0}
-  buyButton: {fileID: 0}
-  closeButton: {fileID: 0}
   showAsModal: 0
 --- !u!1 &6283028965506922841
 GameObject:
@@ -1933,14 +1912,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StoreItem
   store: {fileID: 2880043505621028967}
-  ability: {fileID: 11400000, guid: 345b41e7d72025f49b2a1431ada6e89c, type: 2}
+  ability: {fileID: 11400000, guid: 8441aad2595263f4fad6c339ebf8faaf, type: 2}
   iconButton: {fileID: 7716105767430957568}
   iconImage: {fileID: 5250808286484489962}
-  titleLabel: {fileID: 0}
-  priceLabel: {fileID: 0}
-  effectPreviewLabel: {fileID: 0}
-  infoButton: {fileID: 0}
-  buyButtonInCard: {fileID: 0}
   canBuyColor: {r: 1, g: 1, b: 1, a: 1}
   cantBuyColor: {r: 1, g: 0.9803922, b: 0.9803922, a: 0.34901962}
 --- !u!1 &8746721094438287379

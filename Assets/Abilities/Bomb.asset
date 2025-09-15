@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f699091f512128845856482fe17b4385, type: 3}
-  m_Name: Bomb3x3Ability
-  m_EditorClassIdentifier: Assembly-CSharp::Bomb3x3Ability
-  title: Grass Flower
-  description: 
-  icon: {fileID: -2158441306721915952, guid: d6664d8f23fbaf243b8dcb7893e37011, type: 3}
+  m_Script: {fileID: 11500000, guid: 4babb4ae536e0b844b1a844421904459, type: 3}
+  m_Name: Bomb
+  m_EditorClassIdentifier: Assembly-CSharp::FlowerAbility
+  title: Flower Bomb
   price:
     water: 10
     sun: 10
     earth: 15
     grass: 20
+  ability: 3
+  description: Blasts a 3x3 area

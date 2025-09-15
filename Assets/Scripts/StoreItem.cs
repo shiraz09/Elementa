@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class StoreItem : MonoBehaviour
 {
     public StoreManager store;
-    public BoardAbility ability;
+    public FlowerAbility ability;
 
     public Button iconButton;
     public Image iconImage;

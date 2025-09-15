@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e42647256bfde940b79566d996d8723, type: 3}
-  m_Name: ColumnClearAbility
-  m_EditorClassIdentifier: Assembly-CSharp::ColumnClearAbility
-  title: "Earth Flower \u2013 Column Clear"
-  description: 
-  icon: {fileID: 6626051464634953487, guid: e45838b8df68d174f93bb60ac7c2a6b8, type: 3}
+  m_Script: {fileID: 11500000, guid: 4babb4ae536e0b844b1a844421904459, type: 3}
+  m_Name: ClearColumn
+  m_EditorClassIdentifier: Assembly-CSharp::FlowerAbility
+  title: Clear Column
   price:
     water: 4
     sun: 8
     earth: 16
     grass: 0
+  ability: 1
+  description: Clears a column
