@@ -1013,8 +1013,8 @@ public class Grid : MonoBehaviour
     {
         float punch = 0.12f;
         float tPunch = 0.12f;
-        float tOut = 0.5f;
-        float rot = Random.Range(90f, 270f);
+        float tOut = 0.75f;
+        float rot = 60;
         
         // הורגים טווינים ישנים על האובייקט הזה
         rt.DOKill();
@@ -1024,9 +1024,9 @@ public class Grid : MonoBehaviour
         seq.Append(rt.DOPunchScale(Vector3.one * punch, tPunch, 1, 0.6f));
         seq.Append(
             DOTween.Sequence()
-                .Join(rt.DOScale(0.0f, tOut))
-                .Join(img.DOFade(0f, tOut))
-                .Join(rt.DORotate(new Vector3(0, 0, rot), tOut, RotateMode.Fast))
+                .Join(rt.DOScale(0.0f, tOut).SetEase(Ease.InCubic))
+                .Join(img.DOFade(0f, tOut).SetEase(Ease.InCubic))
+                .Join(rt.DORotate(new Vector3(0, 0, rot), tOut/3).SetLoops(3,LoopType.Incremental).SetEase(Ease.InOutQuad))
                 .Join(rt.DOAnchorPos(rt.GetComponent<RectTransform>().anchoredPosition + dir * 120f, tOut))
         );
         yield return new DOTweenCYInstruction.WaitForCompletion(seq);
