@@ -28,7 +28,7 @@ public class StoreItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     {
         if (!store) store = GetComponentInParent<StoreManager>();
         if (!iconImage && iconButton) iconImage = iconButton.GetComponent<Image>();
-        iconButton.onClick.AddListener(BuildFromAbility);
+        
 
         if (ability.price.water > 0)
         {
@@ -69,15 +69,6 @@ public class StoreItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         if (store && store.bank != null) store.bank.OnChanged -= RefreshState;
     }
 
-    private void BuildFromAbility()
-    {
-        if (ability == null || store == null) return;
-
-        if (iconButton != null)
-        {
-            store.TryBuy(ability);
-        }
-    }
 
     public void RefreshState()
     {

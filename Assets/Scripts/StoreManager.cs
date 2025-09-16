@@ -34,13 +34,7 @@ public class StoreManager : MonoBehaviour
         if (bank) bank.OnChanged -= RefreshAllItems;
     }
 
-    public void TryBuy(FlowerAbility ab, int qty = 1)
-    {
-        if (!ab || !bank || !board) return;
-        var total = Cost.Multiply(ab.price, qty);
-        if (!bank.Spend(total)) { Debug.Log("Not enough resources"); return; }
-        board.EnterAbility(ab);
-    }
+  
 
     public void RefreshAllItems()
     {
