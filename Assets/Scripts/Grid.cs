@@ -458,7 +458,6 @@ public class Grid : MonoBehaviour
     {
         if (activeAbility != null)
         {
-            UseActiveAbilityOn(piece);
             return;
         }
         // אם תרצי – אפשר לחסום בזמן פתיחה:
@@ -474,6 +473,12 @@ public class Grid : MonoBehaviour
 
     public void ReleasePiece()
     {
+        if (activeAbility != null)
+        {
+            pressedPiece = null;
+            enteredPiece = null;
+            return;
+        }
         if (pressedPiece != null && enteredPiece != null && IsAdjacent(pressedPiece, enteredPiece))
             SwapPieces(pressedPiece, enteredPiece);
 
@@ -539,7 +544,7 @@ public class Grid : MonoBehaviour
         RemoveAt(x, y, awardResource, ClearVisual.None);
     }
 
-    private void RemoveAt(int x, int y, bool awardResource = false, ClearVisual visual = ClearVisual.None)
+    private void RemoveAt(int x, int y, bool awardResource = false, ClearVisual visual = ClearVisual.None, System.Action animationComplete = null)
     {
         GamePiece piece = pieces[x, y];
         if (piece == null) return;
@@ -561,8 +566,8 @@ public class Grid : MonoBehaviour
         // לפנות את התא מיד כדי שהמילוי ימשיך
         pieces[x, y] = null;
 
-        // אנימציה והשמדה
-        StartCoroutine(AnimateAndDestroy(piece));
+        // אנימציית "פיצוץ" קצרה ואז הורסים – ללא CanvasGroup
+        StartCoroutine(AnimateAndDestroyAbilities(piece, visual, animationComplete));
     }
 
     public void SwapPieces(GamePiece a, GamePiece b)
@@ -655,21 +660,11 @@ public class Grid : MonoBehaviour
     }
 
     // ————————————————————— Power-ups / Abilities —————————————————————
-    public enum TargetMode { None, Row, Column, Cell3x3, AllOfType }
-
-    public void EnterAbility(FlowerAbility ability) { activeAbility = ability; }
-
-    public void UseActiveAbilityOn(GamePiece piece)
+    
+    public IEnumerator ClearRow(int y)
     {
-        if (activeAbility == null || piece == null) return;
-        FlowerAbility.AbilityMap[activeAbility.ability].Apply(this, piece.X, piece.Y, piece.Type);
-        activeAbility = null;
-        StartCoroutine(FillAndResolve());
-    }
-
-    public void ClearRow(int y)
-    {
-        if (y < 0 || y >= yDim) return;
+        if (y < 0 || y >= yDim) yield break;
+        bool animationComplete = false;
         for (int x = 0; x < xDim; x++)
         {
             GamePiece p = pieces[x, y];
@@ -678,13 +673,15 @@ public class Grid : MonoBehaviour
             if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                 DamageObstacleAt(x, y, 1);
             else
-                RemoveAt(x, y, true, ClearVisual.Row);
+                RemoveAt(x, y, true, ClearVisual.Row , () => animationComplete = true);
         }
+        yield return new WaitUntil(() => animationComplete);
     }
 
-    public void ClearColumn(int x)
+    public IEnumerator ClearColumn(int x)
     {
-        if (x < 0 || x >= xDim) return;
+        if (x < 0 || x >= xDim) yield break;
+        bool animationComplete = false;
         for (int y = 0; y < yDim; y++)
         {
             GamePiece p = pieces[x, y];
@@ -693,12 +690,14 @@ public class Grid : MonoBehaviour
             if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                 DamageObstacleAt(x, y, 1);
             else
-                RemoveAt(x, y, true, ClearVisual.Column);
+                RemoveAt(x, y, true, ClearVisual.Column, () => animationComplete = true);
         }
+        yield return new WaitUntil(() => animationComplete);
     }
 
-    public void ClearAllOfType(PieceType type)
+    public IEnumerator ClearAllOfType(PieceType type)
     {
+        bool animationComplete = false;
         for (int x = 0; x < xDim; x++)
             for (int y = 0; y < yDim; y++)
             {
@@ -706,12 +705,14 @@ public class Grid : MonoBehaviour
                 if (p == null) continue;
                 if (p.Type != type) continue;
 
-                RemoveAt(x, y, true, ClearVisual.Type);
+                RemoveAt(x, y, true, ClearVisual.Type, () => animationComplete = true);
             }
+        yield return new WaitUntil(() => animationComplete);
     }
 
-    public void Bomb3x3(int cx, int cy)
+    public IEnumerator Bomb3x3(int cx, int cy)
     {
+        bool animationComplete = false;
         for (int x = cx - 1; x <= cx + 1; x++)
             for (int y = cy - 1; y <= cy + 1; y++)
                 if (x >= 0 && x < xDim && y >= 0 && y < yDim)
@@ -722,8 +723,9 @@ public class Grid : MonoBehaviour
                     if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                         DamageObstacleAt(x, y, 2);
                     else
-                        RemoveAt(x, y, true, ClearVisual.Bomb);
+                        RemoveAt(x, y, true, ClearVisual.Bomb, () => animationComplete = true);
                 }
+        yield return new WaitUntil(() => animationComplete);
     }
 
     // ————————————————————— Clear / Score / Obstacles synergy —————————————————————
@@ -972,15 +974,100 @@ public class Grid : MonoBehaviour
         ReleasePiece();
     }
 
-    public bool ApplyAbility(FlowerAbility ab, GamePiece piece)
+    public IEnumerator ApplyAbility(FlowerAbility ab, GamePiece piece)
     {
-        if (ab == null || piece == null) return false;
-        FlowerAbility.AbilityMap[ab.ability].Apply(this, piece.X, piece.Y, piece.Type);
+        yield return StartCoroutine(FlowerAbility.AbilityMap[ab.ability].Apply(this, piece.X, piece.Y, piece.Type));
         StartCoroutine(FillAndResolve());
-        return true;
-
-
     }
+
+    IEnumerator AnimateAndDestroyAbilities(GamePiece piece, ClearVisual visual, System.Action animationComplete = null)
+    {
+        if (piece == null) yield break;
+
+        // נמצא Image ו-RectTransform של החלק
+        var img = piece.GetComponent<Image>();
+        if (img == null) img = piece.GetComponentInChildren<Image>();
+        var rt = piece.GetComponent<RectTransform>();
+        if (rt == null && img != null) rt = img.rectTransform;
+
+        if (img != null && rt != null)
+        {
+            switch (visual)
+            {
+                case ClearVisual.Row: yield return FlyAndFade(rt, img, new Vector2(1f, 0f)); break;
+                case ClearVisual.Column: yield return FlyAndFade(rt, img, new Vector2(0f, 1f)); break;
+                case ClearVisual.Bomb: yield return BombFlashAndExplode(rt, img); break;
+                case ClearVisual.Type: yield return FadeAndPop(rt, img, 0.25f, 1.15f); break;
+                default: yield return FadeAndPop(rt, img, 0.22f, 1.05f); break;
+            }
+        }
+        else
+        {
+            // אם אין Image (לא צפוי אצלך), נמתין קצת שלא יעלם מייד
+            yield return new WaitForSeconds(0.15f);
+        }
+
+        // לוגיקת ניקוד קיימת (אם יש לך אותה ב-ClearablePiece אז אפשר להשאיר גם כאן כהשלמה)
+        if (level != null)
+            level.OnPieceCleared(piece);
+
+        Destroy(piece.gameObject);
+        animationComplete?.Invoke();
+    }
+
+    // עף לכיוון נתון + מסתובב + דוהה
+    IEnumerator FlyAndFade(RectTransform rt, Image img, Vector2 dir)
+    {
+        float punch = 0.12f;
+        float tPunch = 0.12f;
+        float tOut = 0.75f;
+        float rot = 60;
+        
+        // הורגים טווינים ישנים על האובייקט הזה
+        rt.DOKill();
+
+        // רצף: פאנץ’ קצר -> היעלמות (סקייל+פייד+רוטציה קלה)
+        var seq = DOTween.Sequence();
+        seq.Append(rt.DOPunchScale(Vector3.one * punch, tPunch, 1, 0.6f));
+        seq.Append(
+            DOTween.Sequence()
+                .Join(rt.DOScale(0.0f, tOut).SetEase(Ease.InCubic))
+                .Join(img.DOFade(0f, tOut).SetEase(Ease.InCubic))
+                .Join(rt.DORotate(new Vector3(0, 0, rot), tOut/3).SetLoops(3,LoopType.Incremental).SetEase(Ease.InOutQuad))
+                .Join(rt.DOAnchorPos(rt.GetComponent<RectTransform>().anchoredPosition + dir * 120f, tOut))
+        );
+        yield return new DOTweenCYInstruction.WaitForCompletion(seq);
+    }
+
+    // הבהוב קצר ואז "פיצוץ": גדילה מהירה + דהייה
+    IEnumerator BombFlashAndExplode(RectTransform rt, Image img)
+    {
+        // פלאש
+        Color c0 = img.color;
+        img.color = Color.white;
+        yield return new WaitForSeconds(0.08f);
+        img.color = c0;
+
+        // "התנפחות" ודהייה
+        yield return FadeAndPop(rt, img, 0.28f, 1.25f);
+    }
+
+    // דהייה ו"פופ" קטן (סקייל־אפ ואז שקיפות)
+    IEnumerator FadeAndPop(RectTransform rt, Image img, float dur, float popScale)
+    {
+        Vector3 s0 = rt.localScale;
+        Vector3 s1 = s0 * popScale;
+        Color c0 = img.color;
+
+        for (float t = 0f; t < dur; t += Time.deltaTime)
+        {
+            float k = t / dur;
+            rt.localScale = Vector3.LerpUnclamped(s0, s1, k);
+            img.color = new Color(c0.r, c0.g, c0.b, 1f - k);
+            yield return null;
+        }
+    }
+
     // ————————————————————— Intro populate (no matches) —————————————————————
 private bool IsObstacle(PieceType t) =>
     t == PieceType.ICEOBS || t == PieceType.GRASSOBS;
@@ -1055,5 +1142,5 @@ private IEnumerator IntroPopulateBoardWithoutMatches()
 
     isIntroFilling = false;
 }
- 
+
 }
