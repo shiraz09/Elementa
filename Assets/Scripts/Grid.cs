@@ -267,16 +267,16 @@ public class Grid : MonoBehaviour
     public bool UseMove()
     {
         if (currentMoves <= 0) return false;
-
         currentMoves--;
         gameUI?.UpdateUI();
-
         if (currentMoves <= 3) gameUI?.ShowNoMovesWarning();
-
         if (currentMoves <= 0)
         {
             Debug.Log("No moves left!");
-            GameOver();
+            if (level is LevelWithGoals lwg)
+                lwg.OnMovesDepleted();
+            else
+                GameOver();
             return false;
         }
         return true;
@@ -533,11 +533,11 @@ public class Grid : MonoBehaviour
 
         return result.Count >= 3 ? result : null;
     }
-    void RemoveAt(int x, int y, bool awardResource = false)
+   // גרסה בסיסית שתישאר אם את קוראת בלי ה-visual
+    private void RemoveAt(int x, int y, bool awardResource = false)
     {
         RemoveAt(x, y, awardResource, ClearVisual.None);
     }
-
 
     private void RemoveAt(int x, int y, bool awardResource = false, ClearVisual visual = ClearVisual.None)
     {
@@ -551,10 +551,17 @@ public class Grid : MonoBehaviour
             bank.Add(piece.Type, 1);
         }
 
-        // מפנים את התא *מיד*, כדי שהמילוי יוכל להמשיך
+        // *** חדש: לדווח ל-Level על איסוף חתיכה רגילה (לא מכשול) ***
+        if (level != null &&
+            piece.Type != PieceType.ICEOBS && piece.Type != PieceType.GRASSOBS)
+        {
+            level.OnPieceCleared(piece);
+        }
+
+        // לפנות את התא מיד כדי שהמילוי ימשיך
         pieces[x, y] = null;
 
-        // אנימציית "פיצוץ" קצרה ואז הורסים – ללא CanvasGroup
+        // אנימציה והשמדה
         StartCoroutine(AnimateAndDestroy(piece));
     }
 
