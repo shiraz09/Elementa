@@ -11,7 +11,7 @@ public class Grid : MonoBehaviour
     public enum PieceType { EARTH, GRASS, WATER, SUN, ICEOBS, GRASSOBS }
     enum ClearVisual { None, Row, Column, Bomb, Type }
 
-    
+
 
     // External systems
     public ResourceManagement bank;
@@ -539,7 +539,7 @@ public class Grid : MonoBehaviour
     }
 
 
-    private void RemoveAt(int x, int y, bool awardResource = false, ClearVisual visual= ClearVisual.None)
+    private void RemoveAt(int x, int y, bool awardResource = false, ClearVisual visual = ClearVisual.None)
     {
         GamePiece piece = pieces[x, y];
         if (piece == null) return;
@@ -699,7 +699,7 @@ public class Grid : MonoBehaviour
                 if (p == null) continue;
                 if (p.Type != type) continue;
 
-                RemoveAt(x, y, true,ClearVisual.Type);
+                RemoveAt(x, y, true, ClearVisual.Type);
             }
     }
 
@@ -974,5 +974,79 @@ public class Grid : MonoBehaviour
 
 
     }
+    // ————————————————————— Intro populate (no matches) —————————————————————
+private bool IsObstacle(PieceType t) =>
+    t == PieceType.ICEOBS || t == PieceType.GRASSOBS;
+
+private PieceType[] GetRegularTypes()
+{
+    List<PieceType> reg = new List<PieceType>();
+    foreach (var t in piecePrefabDict.Keys)
+        if (!IsObstacle(t)) reg.Add(t);
+    return reg.ToArray();
+}
+
+// בודק האם בחירת סוג t בתא (x,y) תיצור מיד מאץ' של 3 (אופקי/אנכי)
+private bool CausesMatchAt(int x, int y, PieceType t)
+{
+    // אופקי: שניים משמאל + אני
+    if (x >= 2)
+    {
+        var p1 = pieces[x - 1, y];
+        var p2 = pieces[x - 2, y];
+        if (p1 != null && p2 != null && p1.Type == t && p2.Type == t)
+            return true;
+    }
+    // אנכי: שניים למעלה + אני
+    if (y >= 2)
+    {
+        var p1 = pieces[x, y - 1];
+        var p2 = pieces[x, y - 2];
+        if (p1 != null && p2 != null && p1.Type == t && p2.Type == t)
+            return true;
+    }
+    return false;
+}
+
+// פתיחת לוח עם "נפילה" מלמעלה וללא מאצ'ים או ניקוד/ניקוי אוטומטי
+private IEnumerator IntroPopulateBoardWithoutMatches()
+{
+    isIntroFilling = true;
+
+    var regularTypes = GetRegularTypes();
+
+    for (int y = 0; y < yDim; y++)
+    {
+        for (int x = 0; x < xDim; x++)
+        {
+            // בוחרים סוג שלא יוצר מאצ' מיידי
+            List<PieceType> candidates = new List<PieceType>(regularTypes);
+            // ערבוב קל כדי לגוון
+            for (int i = 0; i < candidates.Count; i++)
+            {
+                int r = Random.Range(i, candidates.Count);
+                (candidates[i], candidates[r]) = (candidates[r], candidates[i]);
+            }
+
+            PieceType chosen = candidates[0];
+            foreach (var t in candidates)
+            {
+                if (!CausesMatchAt(x, y, t))
+                {
+                    chosen = t;
+                    break;
+                }
+            }
+
+            // יצירה מעל הלוח (y = -1) + אנימציית נפילה למיקום
+            SpawnNewPiece(x, y, chosen, spawnAbove: true);
+        }
+
+        // דיליי קטן בין שורות לנראות "גלישה"
+        yield return new WaitForSeconds(fillTime);
+    }
+
+    isIntroFilling = false;
+}
  
 }
