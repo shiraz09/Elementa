@@ -81,7 +81,7 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
             dx = delta.x > 0 ? 1 : -1;   // right/left
         else
-            dy = delta.y > 0 ? 1 : 1;   // up/down (screen coords)
+            dy = delta.y > 0 ? -1 : 1;   // up/down (screen coords)
 
         grid.TrySwapInDirection(this, dx, dy);
     }

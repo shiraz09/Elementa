@@ -645,7 +645,6 @@ public class Grid : MonoBehaviour
         {
             foreach (GamePiece p in more)
                 if (p != null) RemoveAt(p.X, p.Y, true);
-
             yield return new WaitForSeconds(0.05f);
             StartCoroutine(FillAndResolve());
         }
@@ -980,7 +979,6 @@ public class Grid : MonoBehaviour
         int ny = from.Y + dy;
         GamePiece neighbor = GetPieceAt(nx, ny);
         if (neighbor == null) { ReleasePiece(); return; }
-
         // להשתמש במנגנון ההחלפה הרגיל
         pressedPiece = from;
         enteredPiece = neighbor;
