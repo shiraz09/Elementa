@@ -968,12 +968,5 @@ public class Grid : MonoBehaviour
 
 
     }
-        
-    public bool ApplyAbility(FlowerAbility ab, GamePiece piece)
-    {
-        if (ab == null || piece == null) return false;
-        FlowerAbility.AbilityMap[ab.ability].Apply(this, piece.X, piece.Y, piece.Type);
-        StartCoroutine(FillAndResolve());
-        return true;
-    }
+ 
 }
