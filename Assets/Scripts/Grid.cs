@@ -434,10 +434,19 @@ public class Grid : MonoBehaviour
         var cg = go.GetComponent<CanvasGroup>();
         if (cg != null) cg.alpha = 1f;
 
-        GamePiece gp = go.GetComponent<GamePiece>() ?? go.AddComponent<GamePiece>();
-        gp.Init(x, y, this, type);
-        pieces[x, y] = gp;
-        return gp;
+     GamePiece gp = go.GetComponent<GamePiece>() ?? go.AddComponent<GamePiece>();
+
+     
+     var mv = go.GetComponent<MoveablePiece>();
+     if (mv == null) mv = go.AddComponent<MoveablePiece>();
+
+     var cg2 = go.GetComponent<CanvasGroup>();
+     if (cg2 == null) cg2 = go.AddComponent<CanvasGroup>();
+     cg2.alpha = 1f;
+     gp.Init(x, y, this, type);
+     mv.Init(this);
+     pieces[x, y] = gp;
+    return gp;
     }
 
     public bool IsAdjacent(GamePiece a, GamePiece b)
@@ -558,7 +567,9 @@ public class Grid : MonoBehaviour
         b.transform.SetAsLastSibling();
 
         pieces[ax, ay] = b; a.MoveableComponent.Move(bx, by);
+        Debug.Log($"a to {bx}, {by}");
         pieces[bx, by] = a; b.MoveableComponent.Move(ax, ay);
+        Debug.Log($"b to {ax}, {ay}");
 
         var ma = GetMatch(a, bx, by);
         var mb = GetMatch(b, ax, ay);
@@ -629,7 +640,6 @@ public class Grid : MonoBehaviour
 
     // ————————————————————— Power-ups / Abilities —————————————————————
     public enum TargetMode { None, Row, Column, Cell3x3, AllOfType }
-    private TargetMode pendingMode = TargetMode.None;
 
     public void EnterAbility(FlowerAbility ability) { activeAbility = ability; }
 

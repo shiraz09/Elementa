@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4370001463672311808}
   - component: {fileID: 4843148826906760065}
   - component: {fileID: 9172540234359023073}
-  - component: {fileID: 6408379492278761673}
   - component: {fileID: 4444198969623110396}
   - component: {fileID: 463831482965443419}
   - component: {fileID: 542654291195300351}
@@ -73,19 +72,6 @@ MonoBehaviour:
   punchTime: 0.18
   punchVibrato: 1
   punchElastic: 0.5
---- !u!114 &6408379492278761673
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5356598621357018987}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85e944a63f32a467c98f2a9c44771f0e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ColorPiece
-  colorSprites: []
 --- !u!222 &4444198969623110396
 CanvasRenderer:
   m_ObjectHideFlags: 0

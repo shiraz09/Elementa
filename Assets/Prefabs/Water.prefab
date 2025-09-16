@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2905722453551939266}
   - component: {fileID: 54434857039226195}
-  - component: {fileID: 4099653701076858987}
   - component: {fileID: -8342025937397019198}
   - component: {fileID: 4078099257410205232}
   - component: {fileID: 4947554297381182170}
@@ -54,19 +53,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GamePiece
   score: 0
---- !u!114 &4099653701076858987
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6009271949512519870}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85e944a63f32a467c98f2a9c44771f0e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ColorPiece
-  colorSprites: []
 --- !u!114 &-8342025937397019198
 MonoBehaviour:
   m_ObjectHideFlags: 0

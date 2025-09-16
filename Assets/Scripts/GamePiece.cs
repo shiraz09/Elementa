@@ -11,11 +11,11 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private Grid grid;
 
     private MoveablePiece  moveableComponent;
-    private ColorPiece     colorComponent;
+
     private ClearablePiece clearableComponent;
 
     public MoveablePiece  MoveableComponent  => moveableComponent;
-    public ColorPiece     ColorComponent     => colorComponent;
+
     public ClearablePiece ClearableComponent => clearableComponent;
 
     // swipe tracking
@@ -25,7 +25,7 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     void Awake()
     {
         moveableComponent  = GetComponent<MoveablePiece>();
-        colorComponent     = GetComponent<ColorPiece>();
+
         clearableComponent = GetComponent<ClearablePiece>();
     }
 
@@ -42,7 +42,7 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
     public Grid.PieceType Type => type;
-    public Grid           GridRef => grid;
+    public Grid GridRef => grid;
 
     public void Init(int _x, int _y, Grid _grid, Grid.PieceType _type)
     {
@@ -53,7 +53,10 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         if (moveableComponent == null)
             moveableComponent = GetComponent<MoveablePiece>();
-        moveableComponent?.Init(_grid);
+        if (moveableComponent == null)
+            moveableComponent = gameObject.AddComponent<MoveablePiece>();
+
+        moveableComponent.Init(_grid);
     }
 
     // Input
@@ -78,7 +81,7 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
             dx = delta.x > 0 ? 1 : -1;   // right/left
         else
-            dy = delta.y > 0 ? 1 : -1;   // up/down (screen coords)
+            dy = delta.y > 0 ? 1 : 1;   // up/down (screen coords)
 
         grid.TrySwapInDirection(this, dx, dy);
     }
@@ -91,6 +94,5 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             && moveableComponent != null;
     }
 
-    public bool IsColored()   => colorComponent != null;
     public bool IsClearable() => clearableComponent != null;
 }

@@ -34,18 +34,24 @@ public class MoveablePiece : MonoBehaviour
 
     public void Move(int newX, int newY)
     {
-        if (grid == null || rt == null) return;
+        if (rt == null) return;
 
-        if (piece != null) { piece.X = newX; piece.Y = newY; }
-        Vector2 target = grid.GetUIPos(newX, newY);
+        if (piece != null)
+        {
+            piece.X = newX;
+            piece.Y = newY;
+        }
 
-        // להרוג טווינים קודמים ולהביא לקדמת ההיררכיה
+        Vector2 target = (grid != null) ? grid.GetUIPos(newX, newY) : rt.anchoredPosition;
+
+        // הגנות + הבאת האובייקט לקדמת ההיררכיה
         rt.DOKill();
         rt.SetAsLastSibling();
+        rt.localScale = Vector3.one;
 
         rt.DOAnchorPos(target, moveDuration)
         .SetEase(moveEase)
-        .SetUpdate(false) // משתמש בזמן המשחק (אם תרצי שיעבוד גם כשהמשחק על Pause: SetUpdate(true))
+        .SetUpdate(false)
         .SetLink(rt.gameObject, LinkBehaviour.KillOnDestroy)
         .OnComplete(() =>
         {
