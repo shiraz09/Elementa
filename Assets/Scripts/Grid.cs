@@ -544,7 +544,7 @@ public class Grid : MonoBehaviour
     }
 
 
-    private void RemoveAt(int x, int y, bool awardResource = false, ClearVisual visual = ClearVisual.None)
+    private void RemoveAt(int x, int y, bool awardResource = false, ClearVisual visual = ClearVisual.None, System.Action animationComplete = null)
     {
         GamePiece piece = pieces[x, y];
         if (piece == null) return;
@@ -560,7 +560,7 @@ public class Grid : MonoBehaviour
         pieces[x, y] = null;
 
         // אנימציית "פיצוץ" קצרה ואז הורסים – ללא CanvasGroup
-        StartCoroutine(AnimateAndDestroy(piece));
+        StartCoroutine(AnimateAndDestroy(piece, visual, animationComplete));
     }
 
     public void SwapPieces(GamePiece a, GamePiece b)
@@ -665,9 +665,10 @@ public class Grid : MonoBehaviour
         StartCoroutine(FillAndResolve());
     }
 
-    public void ClearRow(int y)
+    public IEnumerator ClearRow(int y)
     {
-        if (y < 0 || y >= yDim) return;
+        if (y < 0 || y >= yDim) yield break;
+        bool animationComplete = false;
         for (int x = 0; x < xDim; x++)
         {
             GamePiece p = pieces[x, y];
@@ -676,13 +677,15 @@ public class Grid : MonoBehaviour
             if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                 DamageObstacleAt(x, y, 1);
             else
-                RemoveAt(x, y, true, ClearVisual.Row);
+                RemoveAt(x, y, true, ClearVisual.Row , () => animationComplete = true);
         }
+        yield return new WaitUntil(() => animationComplete);
     }
 
-    public void ClearColumn(int x)
+    public IEnumerator ClearColumn(int x)
     {
-        if (x < 0 || x >= xDim) return;
+        if (x < 0 || x >= xDim) yield break;
+        bool animationComplete = false;
         for (int y = 0; y < yDim; y++)
         {
             GamePiece p = pieces[x, y];
@@ -691,12 +694,14 @@ public class Grid : MonoBehaviour
             if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                 DamageObstacleAt(x, y, 1);
             else
-                RemoveAt(x, y, true, ClearVisual.Column);
+                RemoveAt(x, y, true, ClearVisual.Column, () => animationComplete = true);
         }
+        yield return new WaitUntil(() => animationComplete);
     }
 
-    public void ClearAllOfType(PieceType type)
+    public IEnumerator ClearAllOfType(PieceType type)
     {
+        bool animationComplete = false;
         for (int x = 0; x < xDim; x++)
             for (int y = 0; y < yDim; y++)
             {
@@ -704,12 +709,14 @@ public class Grid : MonoBehaviour
                 if (p == null) continue;
                 if (p.Type != type) continue;
 
-                RemoveAt(x, y, true, ClearVisual.Type);
+                RemoveAt(x, y, true, ClearVisual.Type, () => animationComplete = true);
             }
+        yield return new WaitUntil(() => animationComplete);
     }
 
-    public void Bomb3x3(int cx, int cy)
+    public IEnumerator Bomb3x3(int cx, int cy)
     {
+        bool animationComplete = false;
         for (int x = cx - 1; x <= cx + 1; x++)
             for (int y = cy - 1; y <= cy + 1; y++)
                 if (x >= 0 && x < xDim && y >= 0 && y < yDim)
@@ -720,8 +727,9 @@ public class Grid : MonoBehaviour
                     if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                         DamageObstacleAt(x, y, 2);
                     else
-                        RemoveAt(x, y, true, ClearVisual.Bomb);
+                        RemoveAt(x, y, true, ClearVisual.Bomb, () => animationComplete = true);
                 }
+        yield return new WaitUntil(() => animationComplete);
     }
 
     // ————————————————————— Clear / Score / Obstacles synergy —————————————————————
@@ -970,17 +978,13 @@ public class Grid : MonoBehaviour
         ReleasePiece();
     }
 
-    public bool ApplyAbility(FlowerAbility ab, GamePiece piece)
+    public IEnumerator ApplyAbility(FlowerAbility ab, GamePiece piece)
     {
-        if (ab == null || piece == null) return false;
-        FlowerAbility.AbilityMap[ab.ability].Apply(this, piece.X, piece.Y, piece.Type);
+        yield return StartCoroutine(FlowerAbility.AbilityMap[ab.ability].Apply(this, piece.X, piece.Y, piece.Type));
         StartCoroutine(FillAndResolve());
-        return true;
-
-
     }
 
-    IEnumerator AnimateAndDestroy(GamePiece piece, ClearVisual visual)
+    IEnumerator AnimateAndDestroy(GamePiece piece, ClearVisual visual, System.Action animationComplete = null)
     {
         if (piece == null) yield break;
 
@@ -1012,6 +1016,7 @@ public class Grid : MonoBehaviour
             level.OnPieceCleared(piece);
 
         Destroy(piece.gameObject);
+        animationComplete?.Invoke();
     }
 
     // עף לכיוון נתון + מסתובב + דוהה

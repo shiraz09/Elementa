@@ -1,10 +1,11 @@
+using System.Collections;
 using UnityEngine;
 
 public class ClearTypeAbility : BoardAbility
 {
-    public override void Apply(Grid board, int x, int y, Grid.PieceType clickedType)
+    public override IEnumerator Apply(Grid board, int x, int y, Grid.PieceType clickedType)
     {
-        board.ClearAllOfType(clickedType);
+        yield return board.StartCoroutine(board.ClearAllOfType(clickedType));
 
     }
 }

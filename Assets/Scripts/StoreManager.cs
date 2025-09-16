@@ -55,10 +55,10 @@ public class StoreManager : MonoBehaviour
             return false;
         }
 
-        bool ok = board.ApplyAbility(ab, piece); 
-        if (ok) bank.Spend(total);               
+        StartCoroutine(board.ApplyAbility(ab, piece)); 
+        bank.Spend(total);               
 
-        return ok;
+        return true;
     }
 
     
