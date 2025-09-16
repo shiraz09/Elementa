@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using DG.Tweening;
 using DG.Tweening.Core;
 using UnityEngine.UI;
@@ -25,14 +24,6 @@ public class Grid : MonoBehaviour
     {
         public PieceType type;
         public GameObject prefab;
-    }
-
-    [System.Serializable]
-    public struct PiecePosition
-    {
-        public PieceType type;
-        public int x;
-        public int y;
     }
 
     // Board dimensions and timings
@@ -66,7 +57,6 @@ public class Grid : MonoBehaviour
     // Prefabs and grid data
     public PiecePrefab[] piecePrefabs;
     public GameObject backgroundPrefab;
-    public PiecePosition[] initialPieces;
 
     private PieceType[] availableTypes;
     private Dictionary<PieceType, GameObject> piecePrefabDict;
@@ -78,6 +68,10 @@ public class Grid : MonoBehaviour
 
     // Game state
     private bool gameOver = false;
+
+    // Intro fill state (אם תרצי לחסום סוייפים בזמן פתיחה)
+    private bool isIntroFilling = false;
+    public bool IsIntroFilling => isIntroFilling;
 
     // ————————————————————— Lifecycle —————————————————————
     void Start()
@@ -102,7 +96,6 @@ public class Grid : MonoBehaviour
 
         // Background tiles
         for (int x = 0; x < xDim; x++)
-        {
             for (int y = 0; y < yDim; y++)
             {
                 GameObject bg = Instantiate(backgroundPrefab);
@@ -114,31 +107,35 @@ public class Grid : MonoBehaviour
                     rt.sizeDelta = new Vector2(cellSize, cellSize);
                     rt.anchoredPosition = GetUIPos(x, y);
                 }
-                var img = bg.GetComponent<UnityEngine.UI.Image>();
+                var img = bg.GetComponent<Image>();
                 if (img) img.raycastTarget = false;
             }
-        }
 
         // Pieces array
         pieces = new GamePiece[xDim, yDim];
 
-        // Initial fill (random regular pieces only)
-        for (int x = 0; x < xDim; x++)
-            for (int y = 0; y < yDim; y++)
-                SpawnNewPiece(x, y, GetRandomType());
+        // Bootstrap flow
+        StartCoroutine(Bootstrap());
+    }
 
-        // Random obstacles (placed over cells)
+    private IEnumerator Bootstrap()
+    {
+        // פתיחה: לוח ללא מאצ'ים + נפילה מלמעלה (ללא ניקוי/ניקוד)
+        yield return StartCoroutine(IntroPopulateBoardWithoutMatches());
+
+        // מכשולים אקראיים
         SpawnRandomObstacles();
 
-        // Calculate moves (depends on obstacles) and refresh UI
+        // חישוב מהלכים ו־UI
         CalculateMovesForLevel();
         gameUI?.UpdateUI();
 
-        // Fill to resolve gravity and initial matches
-        StartCoroutine(Fill());
-
-        // Start periodic check for no-move situations
+        // בדיקות "אין מהלכים"
         StartMoveChecking();
+
+        // הבטחת מהלך פתיחה חוקי
+        if (!HasPossibleMoves())
+            ShuffleBoard();
     }
 
     // ————————————————————— Helpers —————————————————————
@@ -201,16 +198,14 @@ public class Grid : MonoBehaviour
         if (obstacleType == PieceType.GRASSOBS)
         {
             ob.kind = ObstaclePiece.Kind.Grass;
-            ob.hitsToClear = 3; // 3 שלבים של תמונה + היעלמות בפגיעה הרביעית
+            ob.hitsToClear = 3;
         }
         else
         {
             ob.kind = ObstaclePiece.Kind.Ice;
-            ob.hitsToClear = 6; // מתחלף כל 2 פגיעות, נעלם ב-6
+            ob.hitsToClear = 6;
         }
     }
-
-
 
     // Apply damage to obstacle; returns true if destroyed
     public bool DamageObstacleAt(int x, int y, int amount = 1)
@@ -241,7 +236,7 @@ public class Grid : MonoBehaviour
         if (p != null && (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS))
         {
             var ob = p.GetComponent<ObstaclePiece>();
-            if (ob != null) ob.KillTweens(); // ← חדש
+            if (ob != null) ob.KillTweens();
             Destroy(p.gameObject);
             pieces[x, y] = null;
         }
@@ -421,36 +416,36 @@ public class Grid : MonoBehaviour
         );
     }
 
+    // Spawn regular (in place) OR above (-1) then animate down
     public GamePiece SpawnNewPiece(int x, int y, PieceType type)
+        => SpawnNewPiece(x, y, type, spawnAbove: false);
+
+    public GamePiece SpawnNewPiece(int x, int y, PieceType type, bool spawnAbove)
     {
         GameObject go = Instantiate(piecePrefabDict[type]);
         go.name = $"Piece({x},{y})-{type}";
         go.transform.SetParent(transform, false);
 
-        // איפוס בטוח כדי שלא יישארו שרידי אפקט
         var rt = go.GetComponent<RectTransform>();
         if (rt != null)
         {
             rt.localScale = Vector3.one;
             rt.sizeDelta = new Vector2(cellSize, cellSize);
-            rt.anchoredPosition = GetUIPos(x, y);
+            rt.anchoredPosition = spawnAbove ? GetUIPos(x, -1) : GetUIPos(x, y);
         }
-        var cg = go.GetComponent<CanvasGroup>();
-        if (cg != null) cg.alpha = 1f;
 
-     GamePiece gp = go.GetComponent<GamePiece>() ?? go.AddComponent<GamePiece>();
+        GamePiece gp = go.GetComponent<GamePiece>() ?? go.AddComponent<GamePiece>();
+        var mv = go.GetComponent<MoveablePiece>() ?? go.AddComponent<MoveablePiece>();
+        mv.Init(this);
 
-     
-     var mv = go.GetComponent<MoveablePiece>();
-     if (mv == null) mv = go.AddComponent<MoveablePiece>();
+        // מקבעים יעד במטריצה לפני האנימציה
+        gp.Init(x, y, this, type);
+        pieces[x, y] = gp;
 
-     var cg2 = go.GetComponent<CanvasGroup>();
-     if (cg2 == null) cg2 = go.AddComponent<CanvasGroup>();
-     cg2.alpha = 1f;
-     gp.Init(x, y, this, type);
-     mv.Init(this);
-     pieces[x, y] = gp;
-    return gp;
+        if (spawnAbove)
+            gp.MoveableComponent.Move(x, y);
+
+        return gp;
     }
 
     public bool IsAdjacent(GamePiece a, GamePiece b)
@@ -466,6 +461,8 @@ public class Grid : MonoBehaviour
             UseActiveAbilityOn(piece);
             return;
         }
+        // אם תרצי – אפשר לחסום בזמן פתיחה:
+        // if (isIntroFilling) return;
         pressedPiece = piece;
     }
 
@@ -557,8 +554,8 @@ public class Grid : MonoBehaviour
         // מפנים את התא *מיד*, כדי שהמילוי יוכל להמשיך
         pieces[x, y] = null;
 
-        // מפעילים אנימציית "פיצוץ" קצרה ואז הורסים
-        StartCoroutine(AnimateAndDestroy(piece, visual));
+        // אנימציית "פיצוץ" קצרה ואז הורסים – ללא CanvasGroup
+        StartCoroutine(AnimateAndDestroy(piece));
     }
 
     public void SwapPieces(GamePiece a, GamePiece b)
@@ -584,11 +581,10 @@ public class Grid : MonoBehaviour
         HashSet<GamePiece> toClear = new HashSet<GamePiece>();
         if (ma != null) foreach (var p in ma) toClear.Add(p);
         if (mb != null) foreach (var p in mb) toClear.Add(p);
-        
+
         // Didn't match 3
         if (toClear.Count < 3)
         {
-            // להחזיר חזרה (גם כאן לשמור שהם מלפנים)
             a.transform.SetAsLastSibling();
             b.transform.SetAsLastSibling();
 
@@ -673,7 +669,7 @@ public class Grid : MonoBehaviour
             if (p == null) continue;
 
             if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
-                DamageObstacleAt(x, y, 1);  // נזק במקום מחיקה
+                DamageObstacleAt(x, y, 1);
             else
                 RemoveAt(x, y, true, ClearVisual.Row);
         }
@@ -701,7 +697,7 @@ public class Grid : MonoBehaviour
             {
                 GamePiece p = pieces[x, y];
                 if (p == null) continue;
-                if (p.Type != type) continue; // לא נוגעים במכשולים כאן
+                if (p.Type != type) continue;
 
                 RemoveAt(x, y, true,ClearVisual.Type);
             }
@@ -717,7 +713,7 @@ public class Grid : MonoBehaviour
                     if (p == null) continue;
 
                     if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
-                        DamageObstacleAt(x, y, 2); // פצצה = נזק כפול
+                        DamageObstacleAt(x, y, 2);
                     else
                         RemoveAt(x, y, true, ClearVisual.Bomb);
                 }
@@ -768,12 +764,10 @@ public class Grid : MonoBehaviour
             }
         }
 
-        // score by match size (unique pieces count)
         GamePiece[] arr = new GamePiece[toClear.Count];
         toClear.CopyTo(arr);
         if (arr.Length >= 3) AddMatchScore(arr.Length);
 
-        // clear matched pieces
         foreach (var gp in arr)
         {
             if (gp != null)
@@ -783,7 +777,6 @@ public class Grid : MonoBehaviour
             }
         }
 
-        // obstacles near matches -> damage (not instant remove)
         GamePiece[] oarr = new GamePiece[obsToClear.Count];
         obsToClear.CopyTo(oarr);
         foreach (var ob in oarr)
@@ -808,7 +801,6 @@ public class Grid : MonoBehaviour
                 GamePiece p = pieces[x, y];
                 if (p == null || !p.IsMoveable()) continue;
 
-                // try 4-neighbors
                 int[] dxs = { 1, -1, 0, 0 };
                 int[] dys = { 0, 0, 1, -1 };
                 for (int i = 0; i < 4; i++)
@@ -835,24 +827,16 @@ public class Grid : MonoBehaviour
         Debug.Log("Shuffling board…");
 
         List<GamePiece> movable = new List<GamePiece>();
-        List<Vector2Int> empties = new List<Vector2Int>();
 
         for (int x = 0; x < xDim; x++)
         {
             for (int y = 0; y < yDim; y++)
             {
                 GamePiece p = pieces[x, y];
-                if (p != null)
+                if (p != null && p.IsMoveable())
                 {
-                    if (p.IsMoveable())
-                    {
-                        movable.Add(p);
-                        pieces[x, y] = null;
-                    }
-                }
-                else
-                {
-                    empties.Add(new Vector2Int(x, y));
+                    movable.Add(p);
+                    pieces[x, y] = null;
                 }
             }
         }
@@ -918,27 +902,20 @@ public class Grid : MonoBehaviour
         StopAllCoroutines();
     }
 
-    private System.Collections.IEnumerator AnimateAndDestroy(GamePiece p, bool isObstacle = false)
+    private IEnumerator AnimateAndDestroy(GamePiece p, bool isObstacle = false)
     {
         if (p == null) yield break;
 
-        // קומפוננטים שצריך לאנימציה
         var rt = p.GetComponent<RectTransform>();
         var img = p.GetComponent<Image>();
-        if (img) img.raycastTarget = false;   // שלא יחסום בזמן האנימציה
+        if (img) img.raycastTarget = false;
 
-        // נדאג לפייד נוח
-        var cg = p.GetComponent<CanvasGroup>();
-        if (cg == null) cg = p.gameObject.AddComponent<CanvasGroup>();
-        cg.alpha = 1f;
-
-        // פרמטרים עדינים – אפשר לשחק איתם
+        // פרמטרים לאנימציה (ללא פייד דרך CanvasGroup)
         float punch = isObstacle ? 0.08f : 0.12f;
         float tPunch = 0.12f;
         float tOut = 0.22f;
         float rot = Random.Range(-35f, 35f);
 
-        // אם אין RectTransform (לא סביר ב-UI), פשוט הורסים
         if (rt == null)
         {
             Destroy(p.gameObject);
@@ -947,21 +924,29 @@ public class Grid : MonoBehaviour
 
         // הורגים טווינים ישנים על האובייקט הזה
         rt.DOKill();
-        cg.DOKill();
 
-        // רצף: פאנץ’ קצר -> היעלמות (סקייל+פייד+רוטציה קלה)
-        var seq = DOTween.Sequence().SetLink(p.gameObject, LinkBehaviour.KillOnDestroy);
+        // רצף: פאנץ’ קצר -> היעלמות (סקייל + רוטציה), ואם יש Image – פייד בצבע
+        Sequence seq = DOTween.Sequence().SetLink(p.gameObject, LinkBehaviour.KillOnDestroy);
         seq.Append(rt.DOPunchScale(Vector3.one * punch, tPunch, 1, 0.6f));
-        seq.Append(
-            DOTween.Sequence()
-                .Join(rt.DOScale(0.0f, tOut))
-                .Join(cg.DOFade(0f, tOut))
-                .Join(rt.DORotate(new Vector3(0, 0, rot), tOut, RotateMode.Fast))
-        );
+
+        // נבנה תת-סיקוונס ליציאה
+        Sequence outSeq = DOTween.Sequence()
+            .Join(rt.DOScale(0.0f, tOut))
+            .Join(rt.DORotate(new Vector3(0, 0, rot), tOut, RotateMode.Fast));
+
+        // אם יש Image – נבצע פייד דרך color (לא חובה)
+        if (img != null)
+        {
+            Color c = img.color;
+            outSeq.Join(img.DOColor(new Color(c.r, c.g, c.b, 0f), tOut));
+        }
+
+        seq.Append(outSeq);
 
         yield return seq.WaitForCompletion();
         Destroy(p.gameObject);
     }
+
     public GamePiece GetPieceAt(int x, int y)
     {
         if (x < 0 || x >= xDim || y < 0 || y >= yDim) return null;
@@ -975,7 +960,6 @@ public class Grid : MonoBehaviour
         int ny = from.Y + dy;
         GamePiece neighbor = GetPieceAt(nx, ny);
         if (neighbor == null) { ReleasePiece(); return; }
-        // להשתמש במנגנון ההחלפה הרגיל
         pressedPiece = from;
         enteredPiece = neighbor;
         ReleasePiece();
@@ -990,6 +974,7 @@ public class Grid : MonoBehaviour
 
 
     }
+
     IEnumerator AnimateAndDestroy(GamePiece piece, ClearVisual visual)
     {
         if (piece == null) yield break;
