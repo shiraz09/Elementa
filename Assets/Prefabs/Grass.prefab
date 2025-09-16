@@ -53,6 +53,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e00630efc85454b5fa68b63caca1a78b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GamePiece
+  score: 0
 --- !u!114 &7248300196819329524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -78,6 +79,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15bf2ebd20aa84743a814725eedd2731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoveablePiece
+  moveDuration: 0.25
+  moveEase: 7
+  punchOnEnd: 1
+  punchAmount: 0.1
+  punchTime: 0.18
+  punchVibrato: 1
+  punchElastic: 0.5
 --- !u!222 &165334664089221781
 CanvasRenderer:
   m_ObjectHideFlags: 0
