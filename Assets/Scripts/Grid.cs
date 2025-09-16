@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using DG.Tweening;
+using DG.Tweening.Core;
 using UnityEngine.UI;
 
 public class Grid : MonoBehaviour
@@ -567,9 +568,7 @@ public class Grid : MonoBehaviour
         b.transform.SetAsLastSibling();
 
         pieces[ax, ay] = b; a.MoveableComponent.Move(bx, by);
-        Debug.Log($"a to {bx}, {by}");
         pieces[bx, by] = a; b.MoveableComponent.Move(ax, ay);
-        Debug.Log($"b to {ax}, {ay}");
 
         var ma = GetMatch(a, bx, by);
         var mb = GetMatch(b, ax, ay);
@@ -577,7 +576,8 @@ public class Grid : MonoBehaviour
         HashSet<GamePiece> toClear = new HashSet<GamePiece>();
         if (ma != null) foreach (var p in ma) toClear.Add(p);
         if (mb != null) foreach (var p in mb) toClear.Add(p);
-
+        
+        // Didn't match 3
         if (toClear.Count < 3)
         {
             // להחזיר חזרה (גם כאן לשמור שהם מלפנים)
@@ -589,6 +589,7 @@ public class Grid : MonoBehaviour
             return;
         }
 
+        // Out of moves
         if (!UseMove())
         {
             pieces[ax, ay] = a; a.MoveableComponent.Move(ax, ay);
@@ -598,6 +599,11 @@ public class Grid : MonoBehaviour
 
         level?.OnMove();
 
+        Invoke("ClearAndRefill", 0.25f);
+    }
+
+    private void ClearAndRefill()
+    {
         if (ClearAllValidMatches())
             StartCoroutine(FillAndResolve());
     }
