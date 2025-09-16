@@ -894,8 +894,7 @@ public class Grid : MonoBehaviour
     {
         StopAllCoroutines();
     }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
     private System.Collections.IEnumerator AnimateAndDestroy(GamePiece p, bool isObstacle = false)
     {
         if (p == null) yield break;
@@ -946,30 +945,26 @@ public class Grid : MonoBehaviour
     return pieces[x, y];
 }
 
-public void TrySwapInDirection(GamePiece from, int dx, int dy)
-{
-    if (from == null) return;
-    int nx = from.X + dx;
-    int ny = from.Y + dy;
-    GamePiece neighbor = GetPieceAt(nx, ny);
-    if (neighbor == null) { ReleasePiece(); return; }
+    public void TrySwapInDirection(GamePiece from, int dx, int dy)
+    {
+        if (from == null) return;
+        int nx = from.X + dx;
+        int ny = from.Y + dy;
+        GamePiece neighbor = GetPieceAt(nx, ny);
+        if (neighbor == null) { ReleasePiece(); return; }
 
-    // להשתמש במנגנון ההחלפה הרגיל
-    pressedPiece = from;
-    enteredPiece = neighbor;
-    ReleasePiece();
-=======
-=======
->>>>>>> Stashed changes
+        // להשתמש במנגנון ההחלפה הרגיל
+        pressedPiece = from;
+        enteredPiece = neighbor;
+        ReleasePiece();
+    }
+
     public bool ApplyAbility(FlowerAbility ab, GamePiece piece)
-{
-    if (ab == null || piece == null) return false;
-    FlowerAbility.AbilityMap[ab.ability].Apply(this, piece.X, piece.Y, piece.Type);
-    StartCoroutine(FillAndResolve());
-    return true;
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-}
+    {
+        if (ab == null || piece == null) return false;
+        FlowerAbility.AbilityMap[ab.ability].Apply(this, piece.X, piece.Y, piece.Type);
+        StartCoroutine(FillAndResolve());
+        return true;
+
+    }
 }
