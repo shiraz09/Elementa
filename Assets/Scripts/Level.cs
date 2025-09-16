@@ -2,52 +2,47 @@ using UnityEngine;
 
 public class Level : MonoBehaviour
 {
-    public enum LevelType { TIMER, OBSTACLE, MOVES };
+    public enum LevelType { TIMER, OBSTACLE, MOVES }
 
-    
-    public global::Grid grid;
+    [Header("Refs")]
+    public Grid grid;
 
-    public int score1Star;
-    public int score2Star;
-    public int score3Star;
+    [Header("Stars thresholds")]
+    public int score1Star = 600;
+    public int score2Star = 950;
+    public int score3Star = 1400;
+
+    [Header("Meta")]
+    public int stageIndex = 1;
 
     protected int currentScore;
 
-    // שדה גיבוי לסוג הלבל (נראה גם באינספקטור)
-    [SerializeField] private LevelType levelType;
-
-    // פרופרטי לקריאה בלבד
-    protected LevelType Type
-    {
-        get { return levelType; }
-    }
-
+    // קריאה כשניצחנו/הפסדנו
     public virtual void GameWin()
     {
         Debug.Log("You win!");
-        grid.GameOver();
+        grid?.GameOver();
     }
+
     public virtual void GameLose()
     {
-        Debug.Log("You Lose");
-        grid.GameOver();
+        Debug.Log("You lose!");
+        grid?.GameOver();
     }
-    public virtual void OnMove(){}
 
+    // קריאה מה-Grid אחרי החלפה חוקית
+    public virtual void OnMove() {}
+
+    // קריאה מה-Grid על כל מחיקה של חתיכה רגילה
     public virtual void OnPieceCleared(GamePiece piece)
     {
-        currentScore += piece.score;
-        Debug.Log("Score: " + currentScore);
+        if (piece != null) currentScore += piece.score;
+        // עדכון ניקוד UI יכול להיעשות דרך grid.gameUI.UpdateUI()
     }
-    
+
+    // לא חובה להשתמש, אבל נשאיר אם תרצי מסך סיכום
     public virtual void OnLevelComplete(int finalScore, int starsEarned)
     {
         Debug.Log($"Level completed! Score: {finalScore}, Stars: {starsEarned}");
-        
-        // כאן תוכל להוסיף לוגיקה נוספת כמו:
-        // - שמירת התוצאות
-        // - פתיחת שלב הבא
-        // - הצגת מסך תוצאות
-        // - מתן פרסים
     }
 }

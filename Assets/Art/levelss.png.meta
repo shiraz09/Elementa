@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2bfcef5c74cd44477b6930ba6593b267
+guid: 2b28f9bf0a1b34d3cb9087f6d3f994ea
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2360112025649632247
-    second: back_op_0
+      213: -6464504665341542144
+    second: levelss_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,24 +96,11 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: back_op_0
+      name: levelss_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7f359f6026dc0c020800000000000000
-      internalID: 2360112025649632247
+      spriteID: 001467dd1477946a0800000000000000
+      internalID: -6464504665341542144
       vertices: []
       indices: 
       edges: []
@@ -148,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      back_op_0: 2360112025649632247
+      levelss_0: -6464504665341542144
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

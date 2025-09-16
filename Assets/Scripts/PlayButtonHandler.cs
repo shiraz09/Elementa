@@ -6,6 +6,6 @@ public class PlayButtonHandler : MonoBehaviour
 {
     public void LoadMainScene()
     {
-        SceneManager.LoadScene("Main");   
+        SceneManager.LoadScene("LevelSelect");   
     }
 }
