@@ -9,6 +9,9 @@ public class Grid : MonoBehaviour
 {
     // Piece types (includes obstacles)
     public enum PieceType { EARTH, GRASS, WATER, SUN, ICEOBS, GRASSOBS }
+    enum ClearVisual { None, Row, Column, Bomb, Type }
+
+    
 
     // External systems
     public ResourceManagement bank;
@@ -530,8 +533,13 @@ public class Grid : MonoBehaviour
 
         return result.Count >= 3 ? result : null;
     }
+    void RemoveAt(int x, int y, bool awardResource = false)
+    {
+        RemoveAt(x, y, awardResource, ClearVisual.None);
+    }
 
-    private void RemoveAt(int x, int y, bool awardResource = false)
+
+    private void RemoveAt(int x, int y, bool awardResource = false, ClearVisual visual= ClearVisual.None)
     {
         GamePiece piece = pieces[x, y];
         if (piece == null) return;
@@ -543,7 +551,7 @@ public class Grid : MonoBehaviour
             bank.Add(piece.Type, 1);
         }
 
-        // מפנים את התא *מיד*
+        // מפנים את התא *מיד*, כדי שהמילוי יוכל להמשיך
         pieces[x, y] = null;
 
         // אנימציית "פיצוץ" קצרה ואז הורסים – ללא CanvasGroup
@@ -663,7 +671,7 @@ public class Grid : MonoBehaviour
             if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                 DamageObstacleAt(x, y, 1);
             else
-                RemoveAt(x, y, true);
+                RemoveAt(x, y, true, ClearVisual.Row);
         }
     }
 
@@ -678,7 +686,7 @@ public class Grid : MonoBehaviour
             if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                 DamageObstacleAt(x, y, 1);
             else
-                RemoveAt(x, y, true);
+                RemoveAt(x, y, true, ClearVisual.Column);
         }
     }
 
@@ -691,7 +699,7 @@ public class Grid : MonoBehaviour
                 if (p == null) continue;
                 if (p.Type != type) continue;
 
-                RemoveAt(x, y, true);
+                RemoveAt(x, y, true,ClearVisual.Type);
             }
     }
 
@@ -707,7 +715,7 @@ public class Grid : MonoBehaviour
                     if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                         DamageObstacleAt(x, y, 2);
                     else
-                        RemoveAt(x, y, true);
+                        RemoveAt(x, y, true, ClearVisual.Bomb);
                 }
     }
 
@@ -963,77 +971,8 @@ public class Grid : MonoBehaviour
         FlowerAbility.AbilityMap[ab.ability].Apply(this, piece.X, piece.Y, piece.Type);
         StartCoroutine(FillAndResolve());
         return true;
+
+
     }
-
-    // ————————————————————— Intro populate (no matches) —————————————————————
-    private bool IsObstacle(PieceType t) =>
-        t == PieceType.ICEOBS || t == PieceType.GRASSOBS;
-
-    private PieceType[] GetRegularTypes()
-    {
-        List<PieceType> reg = new List<PieceType>();
-        foreach (var t in piecePrefabDict.Keys)
-            if (!IsObstacle(t)) reg.Add(t);
-        return reg.ToArray();
-    }
-
-    // בודק האם בחירת סוג t בתא (x,y) תיצור מיד מאצ' של 3 (אופקי/אנכי)
-    private bool CausesMatchAt(int x, int y, PieceType t)
-    {
-        // אופקי: שניים משמאל + אני
-        if (x >= 2)
-        {
-            var p1 = pieces[x - 1, y];
-            var p2 = pieces[x - 2, y];
-            if (p1 != null && p2 != null && p1.Type == t && p2.Type == t)
-                return true;
-        }
-        // אנכי: שניים למעלה + אני
-        if (y >= 2)
-        {
-            var p1 = pieces[x, y - 1];
-            var p2 = pieces[x, y - 2];
-            if (p1 != null && p2 != null && p1.Type == t && p2.Type == t)
-                return true;
-        }
-        return false;
-    }
-
-    // פתיחת לוח עם נפילה שורתית (ללא ניקוי/ניקוד)
-    private IEnumerator IntroPopulateBoardWithoutMatches()
-    {
-        isIntroFilling = true;
-
-        var regularTypes = GetRegularTypes();
-
-        for (int y = 0; y < yDim; y++)
-        {
-            for (int x = 0; x < xDim; x++)
-            {
-                // בוחרים סוג שלא יוצר מאצ' מיידי
-                List<PieceType> candidates = new List<PieceType>(regularTypes);
-                for (int i = 0; i < candidates.Count; i++)
-                {
-                    int r = Random.Range(i, candidates.Count);
-                    (candidates[i], candidates[r]) = (candidates[r], candidates[i]);
-                }
-
-                PieceType chosen = candidates[0];
-                foreach (var t in candidates)
-                {
-                    if (!CausesMatchAt(x, y, t))
-                    {
-                        chosen = t;
-                        break;
-                    }
-                }
-                // יצירה מעל הלוח ונפילה למיקום
-                SpawnNewPiece(x, y, chosen, spawnAbove: true);
-            }
-            // דיליי קטן בין שורות לנראות "גלישה"
-            yield return new WaitForSeconds(fillTime);
-        }
-
-        isIntroFilling = false;
-    }
+ 
 }

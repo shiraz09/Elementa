@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -1171699401279892448}
   - component: {fileID: 641461928313949404}
   - component: {fileID: 7314852347025928057}
+  - component: {fileID: 1817809996213170761}
   m_Layer: 5
   m_Name: Earth
   m_TagString: EARTH
@@ -170,3 +171,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClearablePiece
   clearAnimation: {fileID: 7400000, guid: 16e6e9aaf97ed4ba3abe3553f0c5fe3f, type: 2}
+--- !u!114 &1817809996213170761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8916939968318098730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf06627526c84d54e86311fe94f50932, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClearEffect
+  flashDuration: 0.35
+  flashColor: {r: 0.87169814, g: 0.7779048, b: 0.11677466, a: 1}

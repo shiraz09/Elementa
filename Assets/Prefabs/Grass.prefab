@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 165334664089221781}
   - component: {fileID: 6524504137025248592}
   - component: {fileID: 2404082015909727899}
+  - component: {fileID: 1966849562382475764}
   m_Layer: 0
   m_Name: Grass
   m_TagString: GRASS
@@ -156,3 +157,17 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1966849562382475764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5527148095521903902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf06627526c84d54e86311fe94f50932, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClearEffect
+  flashDuration: 0.35
+  flashColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
