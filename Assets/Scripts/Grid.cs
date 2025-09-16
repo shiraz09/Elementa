@@ -10,6 +10,9 @@ public class Grid : MonoBehaviour
 {
     // Piece types (includes obstacles)
     public enum PieceType { EARTH, GRASS, WATER, SUN, ICEOBS, GRASSOBS }
+    enum ClearVisual { None, Row, Column, Bomb, Type }
+
+    
 
     // External systems
     public ResourceManagement bank;
@@ -533,8 +536,13 @@ public class Grid : MonoBehaviour
 
         return result.Count >= 3 ? result : null;
     }
+    void RemoveAt(int x, int y, bool awardResource = false)
+    {
+        RemoveAt(x, y, awardResource, ClearVisual.None);
+    }
 
-    private void RemoveAt(int x, int y, bool awardResource = false)
+
+    private void RemoveAt(int x, int y, bool awardResource = false, ClearVisual visual= ClearVisual.None)
     {
         GamePiece piece = pieces[x, y];
         if (piece == null) return;
@@ -546,11 +554,15 @@ public class Grid : MonoBehaviour
             bank.Add(piece.Type, 1);
         }
 
+       
+
+
+
         // מפנים את התא *מיד*, כדי שהמילוי יוכל להמשיך
         pieces[x, y] = null;
 
         // מפעילים אנימציית "פיצוץ" קצרה ואז הורסים
-        StartCoroutine(AnimateAndDestroy(piece));
+        StartCoroutine(AnimateAndDestroy(piece, visual));
     }
 
     public void SwapPieces(GamePiece a, GamePiece b)
@@ -668,7 +680,7 @@ public class Grid : MonoBehaviour
             if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                 DamageObstacleAt(x, y, 1);  // נזק במקום מחיקה
             else
-                RemoveAt(x, y, true);
+                RemoveAt(x, y, true, ClearVisual.Row);
         }
     }
 
@@ -683,7 +695,7 @@ public class Grid : MonoBehaviour
             if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                 DamageObstacleAt(x, y, 1);
             else
-                RemoveAt(x, y, true);
+                RemoveAt(x, y, true, ClearVisual.Column);
         }
     }
 
@@ -696,7 +708,7 @@ public class Grid : MonoBehaviour
                 if (p == null) continue;
                 if (p.Type != type) continue; // לא נוגעים במכשולים כאן
 
-                RemoveAt(x, y, true);
+                RemoveAt(x, y, true,ClearVisual.Type);
             }
     }
 
@@ -712,7 +724,7 @@ public class Grid : MonoBehaviour
                     if (p.Type == PieceType.ICEOBS || p.Type == PieceType.GRASSOBS)
                         DamageObstacleAt(x, y, 2); // פצצה = נזק כפול
                     else
-                        RemoveAt(x, y, true);
+                        RemoveAt(x, y, true, ClearVisual.Bomb);
                 }
     }
 
@@ -956,10 +968,10 @@ public class Grid : MonoBehaviour
         Destroy(p.gameObject);
     }
     public GamePiece GetPieceAt(int x, int y)
-{
-    if (x < 0 || x >= xDim || y < 0 || y >= yDim) return null;
-    return pieces[x, y];
-}
+    {
+        if (x < 0 || x >= xDim || y < 0 || y >= yDim) return null;
+        return pieces[x, y];
+    }
 
     public void TrySwapInDirection(GamePiece from, int dx, int dy)
     {
@@ -984,5 +996,87 @@ public class Grid : MonoBehaviour
 
 
     }
- 
+    IEnumerator AnimateAndDestroy(GamePiece piece, ClearVisual visual)
+    {
+        if (piece == null) yield break;
+
+        // נמצא Image ו-RectTransform של החלק
+        var img = piece.GetComponent<Image>();
+        if (img == null) img = piece.GetComponentInChildren<Image>();
+        var rt = piece.GetComponent<RectTransform>();
+        if (rt == null && img != null) rt = img.rectTransform;
+
+        if (img != null && rt != null)
+        {
+            switch (visual)
+            {
+                case ClearVisual.Row: yield return FlyAndFade(rt, img, new Vector2(Random.value < .5f ? -1f : 1f, 0f)); break;
+                case ClearVisual.Column: yield return FlyAndFade(rt, img, new Vector2(0f, 1f)); break;
+                case ClearVisual.Bomb: yield return BombFlashAndExplode(rt, img); break;
+                case ClearVisual.Type: yield return FadeAndPop(rt, img, 0.25f, 1.15f); break;
+                default: yield return FadeAndPop(rt, img, 0.22f, 1.05f); break;
+            }
+        }
+        else
+        {
+            // אם אין Image (לא צפוי אצלך), נמתין קצת שלא יעלם מייד
+            yield return new WaitForSeconds(0.15f);
+        }
+
+        // לוגיקת ניקוד קיימת (אם יש לך אותה ב-ClearablePiece אז אפשר להשאיר גם כאן כהשלמה)
+        if (level != null)
+            level.OnPieceCleared(piece);
+
+        Destroy(piece.gameObject);
+    }
+
+    // עף לכיוון נתון + מסתובב + דוהה
+    IEnumerator FlyAndFade(RectTransform rt, Image img, Vector2 dir)
+    {
+        float dur = 0.35f;
+        dir = dir.normalized;
+        Vector2 start = rt.anchoredPosition;
+        Vector2 target = start + dir * 120f + new Vector2(Random.Range(-20f, 20f), Random.Range(-10f, 10f));
+        float rotZ = Random.Range(-50f, 50f);
+        Color c0 = img.color;
+
+        for (float t = 0f; t < dur; t += Time.deltaTime)
+        {
+            float k = t / dur;                    // 0..1
+            float ease = k * k * (3f - 2f * k);   // smoothstep
+            rt.anchoredPosition = Vector2.LerpUnclamped(start, target, ease);
+            rt.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(0, rotZ, ease));
+            img.color = new Color(c0.r, c0.g, c0.b, 1f - k);
+            yield return null;
+        }
+    }
+
+    // הבהוב קצר ואז "פיצוץ": גדילה מהירה + דהייה
+    IEnumerator BombFlashAndExplode(RectTransform rt, Image img)
+    {
+        // פלאש
+        Color c0 = img.color;
+        img.color = Color.white;
+        yield return new WaitForSeconds(0.08f);
+        img.color = c0;
+
+        // "התנפחות" ודהייה
+        yield return FadeAndPop(rt, img, 0.28f, 1.25f);
+    }
+
+    // דהייה ו"פופ" קטן (סקייל־אפ ואז שקיפות)
+    IEnumerator FadeAndPop(RectTransform rt, Image img, float dur, float popScale)
+    {
+        Vector3 s0 = rt.localScale;
+        Vector3 s1 = s0 * popScale;
+        Color c0 = img.color;
+
+        for (float t = 0f; t < dur; t += Time.deltaTime)
+        {
+            float k = t / dur;
+            rt.localScale = Vector3.LerpUnclamped(s0, s1, k);
+            img.color = new Color(c0.r, c0.g, c0.b, 1f - k);
+            yield return null;
+        }
+    }
 }
