@@ -554,10 +554,6 @@ public class Grid : MonoBehaviour
             bank.Add(piece.Type, 1);
         }
 
-       
-
-
-
         // מפנים את התא *מיד*, כדי שהמילוי יוכל להמשיך
         pieces[x, y] = null;
 
@@ -1008,7 +1004,7 @@ public class Grid : MonoBehaviour
         {
             switch (visual)
             {
-                case ClearVisual.Row: yield return FlyAndFade(rt, img, new Vector2(Random.value < .5f ? -1f : 1f, 0f)); break;
+                case ClearVisual.Row: yield return FlyAndFade(rt, img, new Vector2(1f, 0f)); break;
                 case ClearVisual.Column: yield return FlyAndFade(rt, img, new Vector2(0f, 1f)); break;
                 case ClearVisual.Bomb: yield return BombFlashAndExplode(rt, img); break;
                 case ClearVisual.Type: yield return FadeAndPop(rt, img, 0.25f, 1.15f); break;
@@ -1031,22 +1027,25 @@ public class Grid : MonoBehaviour
     // עף לכיוון נתון + מסתובב + דוהה
     IEnumerator FlyAndFade(RectTransform rt, Image img, Vector2 dir)
     {
-        float dur = 0.35f;
-        dir = dir.normalized;
-        Vector2 start = rt.anchoredPosition;
-        Vector2 target = start + dir * 120f + new Vector2(Random.Range(-20f, 20f), Random.Range(-10f, 10f));
-        float rotZ = Random.Range(-50f, 50f);
-        Color c0 = img.color;
+        float punch = 0.12f;
+        float tPunch = 0.12f;
+        float tOut = 0.5f;
+        float rot = Random.Range(90f, 270f);
+        
+        // הורגים טווינים ישנים על האובייקט הזה
+        rt.DOKill();
 
-        for (float t = 0f; t < dur; t += Time.deltaTime)
-        {
-            float k = t / dur;                    // 0..1
-            float ease = k * k * (3f - 2f * k);   // smoothstep
-            rt.anchoredPosition = Vector2.LerpUnclamped(start, target, ease);
-            rt.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(0, rotZ, ease));
-            img.color = new Color(c0.r, c0.g, c0.b, 1f - k);
-            yield return null;
-        }
+        // רצף: פאנץ’ קצר -> היעלמות (סקייל+פייד+רוטציה קלה)
+        var seq = DOTween.Sequence();
+        seq.Append(rt.DOPunchScale(Vector3.one * punch, tPunch, 1, 0.6f));
+        seq.Append(
+            DOTween.Sequence()
+                .Join(rt.DOScale(0.0f, tOut))
+                .Join(img.DOFade(0f, tOut))
+                .Join(rt.DORotate(new Vector3(0, 0, rot), tOut, RotateMode.Fast))
+                .Join(rt.DOAnchorPos(rt.GetComponent<RectTransform>().anchoredPosition + dir * 120f, tOut))
+        );
+        yield return new DOTweenCYInstruction.WaitForCompletion(seq);
     }
 
     // הבהוב קצר ואז "פיצוץ": גדילה מהירה + דהייה
