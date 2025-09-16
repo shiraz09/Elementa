@@ -1,0 +1,13 @@
+using UnityEngine;
+public class SafeAreaFitter : MonoBehaviour {
+    void OnEnable() { Apply(); }
+    void Apply() {
+        var rt = GetComponent<RectTransform>();
+        var sa = Screen.safeArea;
+        Vector2 a = sa.position;
+        Vector2 b = sa.position + sa.size;
+        a.x /= Screen.width;   b.x /= Screen.width;
+        a.y /= Screen.height;  b.y /= Screen.height;
+        rt.anchorMin = a; rt.anchorMax = b;
+    }
+}

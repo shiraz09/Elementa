@@ -31,6 +31,7 @@ public class HomeUI : MonoBehaviour
     void Awake()
     {
         if (soundButton) soundBtnImg = soundButton.GetComponent<Image>();
+        DontDestroyOnLoad(gameObject);
     }
 
     void Start()
