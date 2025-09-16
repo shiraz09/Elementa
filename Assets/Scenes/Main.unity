@@ -119,17 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!114 &120110062 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7754911444162863352, guid: 2f1bac88086c401439611d312a5c8229, type: 3}
-  m_PrefabInstance: {fileID: 2098727165}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &441468458
 GameObject:
   m_ObjectHideFlags: 0
@@ -371,17 +360,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!114 &646575638 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8861027507478387868, guid: 2f1bac88086c401439611d312a5c8229, type: 3}
-  m_PrefabInstance: {fileID: 2098727165}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &895136884
 GameObject:
   m_ObjectHideFlags: 0
@@ -391,7 +369,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 895136886}
-  - component: {fileID: 895136885}
   m_Layer: 0
   m_Name: Bank
   m_TagString: Untagged
@@ -399,7 +376,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &895136885
+--- !u!114 &895136885 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 573047311155905735, guid: 2f1bac88086c401439611d312a5c8229, type: 3}
   m_PrefabInstance: {fileID: 2098727165}
@@ -410,14 +387,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b35a73a3514a95b4c912e08ee9a4e32c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceManagement
-  water: 0
-  sun: 0
-  earth: 0
-  grass: 0
-  waterText: {fileID: 1127765884}
-  sunText: {fileID: 120110062}
-  earthText: {fileID: 1684215693}
-  grassText: {fileID: 646575638}
 --- !u!4 &895136886
 Transform:
   m_ObjectHideFlags: 0
@@ -512,17 +481,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1127765884 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 303802480736914358, guid: 2f1bac88086c401439611d312a5c8229, type: 3}
-  m_PrefabInstance: {fileID: 2098727165}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &1301042841
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -531,6 +489,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 441468462}
     m_Modifications:
+    - target: {fileID: 1176590887274178247, guid: 82f92f96186f67646b985f3cdd6425ec, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 1176590887274178247, guid: 82f92f96186f67646b985f3cdd6425ec, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 4542548211748576192, guid: 82f92f96186f67646b985f3cdd6425ec, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 4542548211748576192, guid: 82f92f96186f67646b985f3cdd6425ec, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     - target: {fileID: 4563396643704225643, guid: 82f92f96186f67646b985f3cdd6425ec, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -640,17 +614,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a203664d9ecc64a3a9000cbc8a5c1e61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Grid
---- !u!114 &1684215693 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5946042251533957191, guid: 2f1bac88086c401439611d312a5c8229, type: 3}
-  m_PrefabInstance: {fileID: 2098727165}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &1982428792
 GameObject:
   m_ObjectHideFlags: 0
@@ -1143,3 +1106,4 @@ SceneRoots:
   - {fileID: 599030123}
   - {fileID: 441468462}
   - {fileID: 1050813174}
+  - {fileID: 895136886}
