@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using DG.Tweening;
+using UnityEngine.UI;
 
 public class Grid : MonoBehaviour
 {
@@ -220,9 +222,8 @@ public class Grid : MonoBehaviour
                 bool destroyed = ob.Damage(amount);
                 if (destroyed)
                 {
-                    ob.KillTweens();     // ← חדש
-                    Destroy(p.gameObject);
-                    pieces[x, y] = null;
+                    pieces[x, y] = null;                 // לפנות סלוט קודם
+                    StartCoroutine(AnimateAndDestroy(p)); // אנימציה ואז Destroy
                 }
                 return destroyed;
             }
@@ -421,14 +422,19 @@ public class Grid : MonoBehaviour
         GameObject go = Instantiate(piecePrefabDict[type]);
         go.name = $"Piece({x},{y})-{type}";
         go.transform.SetParent(transform, false);
-        RectTransform rt = go.GetComponent<RectTransform>();
+
+        // איפוס בטוח כדי שלא יישארו שרידי אפקט
+        var rt = go.GetComponent<RectTransform>();
         if (rt != null)
         {
+            rt.localScale = Vector3.one;
             rt.sizeDelta = new Vector2(cellSize, cellSize);
             rt.anchoredPosition = GetUIPos(x, y);
         }
-        GamePiece gp = go.GetComponent<GamePiece>();
-        if (gp == null) gp = go.AddComponent<GamePiece>();
+        var cg = go.GetComponent<CanvasGroup>();
+        if (cg != null) cg.alpha = 1f;
+
+        GamePiece gp = go.GetComponent<GamePiece>() ?? go.AddComponent<GamePiece>();
         gp.Init(x, y, this, type);
         pieces[x, y] = gp;
         return gp;
@@ -521,18 +527,20 @@ public class Grid : MonoBehaviour
     private void RemoveAt(int x, int y, bool awardResource = false)
     {
         GamePiece piece = pieces[x, y];
-        if (piece != null)
+        if (piece == null) return;
+
+        // לא להעניק ריסורסים על מכשולים
+        if (awardResource && bank != null &&
+            piece.Type != PieceType.ICEOBS && piece.Type != PieceType.GRASSOBS)
         {
-            // obstacles don't award resources
-            if (awardResource && bank != null &&
-                piece.Type != PieceType.ICEOBS && piece.Type != PieceType.GRASSOBS)
-            {
-                bank.Add(piece.Type, 1);
-            }
-            piece.MoveableComponent?.KillTweens();
-            Destroy(piece.gameObject);
-            pieces[x, y] = null;
+            bank.Add(piece.Type, 1);
         }
+
+        // מפנים את התא *מיד*, כדי שהמילוי יוכל להמשיך
+        pieces[x, y] = null;
+
+        // מפעילים אנימציית "פיצוץ" קצרה ואז הורסים
+        StartCoroutine(AnimateAndDestroy(piece));
     }
 
     public void SwapPieces(GamePiece a, GamePiece b)
@@ -545,11 +553,15 @@ public class Grid : MonoBehaviour
         int ax = a.X, ay = a.Y;
         int bx = b.X, by = b.Y;
 
+        // להביא לקדמת ההיררכיה בזמן האנימציה
+        a.transform.SetAsLastSibling();
+        b.transform.SetAsLastSibling();
+
         pieces[ax, ay] = b; a.MoveableComponent.Move(bx, by);
         pieces[bx, by] = a; b.MoveableComponent.Move(ax, ay);
 
-        List<GamePiece> ma = GetMatch(a, bx, by);
-        List<GamePiece> mb = GetMatch(b, ax, ay);
+        var ma = GetMatch(a, bx, by);
+        var mb = GetMatch(b, ax, ay);
 
         HashSet<GamePiece> toClear = new HashSet<GamePiece>();
         if (ma != null) foreach (var p in ma) toClear.Add(p);
@@ -557,13 +569,15 @@ public class Grid : MonoBehaviour
 
         if (toClear.Count < 3)
         {
-            // revert
+            // להחזיר חזרה (גם כאן לשמור שהם מלפנים)
+            a.transform.SetAsLastSibling();
+            b.transform.SetAsLastSibling();
+
             pieces[ax, ay] = a; a.MoveableComponent.Move(ax, ay);
             pieces[bx, by] = b; b.MoveableComponent.Move(bx, by);
             return;
         }
 
-        // consume move; if none left, revert and exit
         if (!UseMove())
         {
             pieces[ax, ay] = a; a.MoveableComponent.Move(ax, ay);
@@ -880,4 +894,67 @@ public class Grid : MonoBehaviour
     {
         StopAllCoroutines();
     }
+    private System.Collections.IEnumerator AnimateAndDestroy(GamePiece p, bool isObstacle = false)
+    {
+        if (p == null) yield break;
+
+        // קומפוננטים שצריך לאנימציה
+        var rt = p.GetComponent<RectTransform>();
+        var img = p.GetComponent<Image>();
+        if (img) img.raycastTarget = false;   // שלא יחסום בזמן האנימציה
+
+        // נדאג לפייד נוח
+        var cg = p.GetComponent<CanvasGroup>();
+        if (cg == null) cg = p.gameObject.AddComponent<CanvasGroup>();
+        cg.alpha = 1f;
+
+        // פרמטרים עדינים – אפשר לשחק איתם
+        float punch = isObstacle ? 0.08f : 0.12f;
+        float tPunch = 0.12f;
+        float tOut = 0.22f;
+        float rot = Random.Range(-35f, 35f);
+
+        // אם אין RectTransform (לא סביר ב-UI), פשוט הורסים
+        if (rt == null)
+        {
+            Destroy(p.gameObject);
+            yield break;
+        }
+
+        // הורגים טווינים ישנים על האובייקט הזה
+        rt.DOKill();
+        cg.DOKill();
+
+        // רצף: פאנץ’ קצר -> היעלמות (סקייל+פייד+רוטציה קלה)
+        var seq = DOTween.Sequence().SetLink(p.gameObject, LinkBehaviour.KillOnDestroy);
+        seq.Append(rt.DOPunchScale(Vector3.one * punch, tPunch, 1, 0.6f));
+        seq.Append(
+            DOTween.Sequence()
+                .Join(rt.DOScale(0.0f, tOut))
+                .Join(cg.DOFade(0f, tOut))
+                .Join(rt.DORotate(new Vector3(0, 0, rot), tOut, RotateMode.Fast))
+        );
+
+        yield return seq.WaitForCompletion();
+        Destroy(p.gameObject);
+    }
+    public GamePiece GetPieceAt(int x, int y)
+{
+    if (x < 0 || x >= xDim || y < 0 || y >= yDim) return null;
+    return pieces[x, y];
+}
+
+public void TrySwapInDirection(GamePiece from, int dx, int dy)
+{
+    if (from == null) return;
+    int nx = from.X + dx;
+    int ny = from.Y + dy;
+    GamePiece neighbor = GetPieceAt(nx, ny);
+    if (neighbor == null) { ReleasePiece(); return; }
+
+    // להשתמש במנגנון ההחלפה הרגיל
+    pressedPiece = from;
+    enteredPiece = neighbor;
+    ReleasePiece();
+}
 }

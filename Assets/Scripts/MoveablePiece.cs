@@ -36,29 +36,23 @@ public class MoveablePiece : MonoBehaviour
     {
         if (grid == null || rt == null) return;
 
-        if (piece != null)
-        {
-            piece.X = newX;
-            piece.Y = newY;
-        }
-
+        if (piece != null) { piece.X = newX; piece.Y = newY; }
         Vector2 target = grid.GetUIPos(newX, newY);
 
-        // Stop any existing tweens on this RectTransform
+        // להרוג טווינים קודמים ולהביא לקדמת ההיררכיה
         rt.DOKill();
+        rt.SetAsLastSibling();
 
-        // Smooth move
         rt.DOAnchorPos(target, moveDuration)
-          .SetEase(moveEase)
-          .SetLink(rt.gameObject, LinkBehaviour.KillOnDestroy)
-          .OnComplete(() =>
-          {
-              if (!punchOnEnd || rt == null) return;
-
-              // Small punch on landing
-              rt.DOPunchScale(Vector3.one * punchAmount, punchTime, punchVibrato, punchElastic)
+        .SetEase(moveEase)
+        .SetUpdate(false) // משתמש בזמן המשחק (אם תרצי שיעבוד גם כשהמשחק על Pause: SetUpdate(true))
+        .SetLink(rt.gameObject, LinkBehaviour.KillOnDestroy)
+        .OnComplete(() =>
+        {
+            if (!punchOnEnd || rt == null) return;
+            rt.DOPunchScale(Vector3.one * punchAmount, punchTime, punchVibrato, punchElastic)
                 .SetLink(rt.gameObject, LinkBehaviour.KillOnDestroy);
-          });
+        });
     }
 
     public void KillTweens()

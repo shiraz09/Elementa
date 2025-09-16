@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerUpHandler
+public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     private int x;
     private int y;
@@ -18,9 +18,13 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerEnterHandle
     public ColorPiece     ColorComponent     => colorComponent;
     public ClearablePiece ClearableComponent => clearableComponent;
 
+    // swipe tracking
+    private Vector2 pressScreenPos;
+    private const float SWIPE_THRESHOLD = 12f; // pixels
+
     void Awake()
     {
-        moveableComponent  = GetComponent<MoveablePiece>();   // שימי לב: זה הקומפוננט היחיד שמזיז
+        moveableComponent  = GetComponent<MoveablePiece>();
         colorComponent     = GetComponent<ColorPiece>();
         clearableComponent = GetComponent<ClearablePiece>();
     }
@@ -37,7 +41,7 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerEnterHandle
         set { if (IsMoveable()) y = value; }
     }
 
-    public Grid.PieceType Type   => type;
+    public Grid.PieceType Type => type;
     public Grid           GridRef => grid;
 
     public void Init(int _x, int _y, Grid _grid, Grid.PieceType _type)
@@ -47,19 +51,39 @@ public class GamePiece : MonoBehaviour, IPointerDownHandler, IPointerEnterHandle
         grid = _grid;
         type = _type;
 
-        // לוודא שיש MoveablePiece ושהוא מאותחל עם ה-Grid
         if (moveableComponent == null)
             moveableComponent = GetComponent<MoveablePiece>();
-
         moveableComponent?.Init(_grid);
     }
 
-    // קלט עכבר/מגע
-    public void OnPointerDown (PointerEventData e) => grid.PressPiece(this);
-    public void OnPointerEnter(PointerEventData e) => grid.EnterPiece(this);
-    public void OnPointerUp   (PointerEventData e) => grid.ReleasePiece();
+    // Input
+    public void OnPointerDown(PointerEventData e)
+    {
+        pressScreenPos = e.position;
+        grid.PressPiece(this);
+    }
 
-    // מכשולים לא ניתנים להזזה
+    public void OnPointerUp(PointerEventData e)
+    {
+        Vector2 delta = e.position - pressScreenPos;
+
+        // tap or too short swipe → cancel
+        if (delta.magnitude < SWIPE_THRESHOLD)
+        {
+            grid.ReleasePiece();
+            return;
+        }
+
+        int dx = 0, dy = 0;
+        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+            dx = delta.x > 0 ? 1 : -1;   // right/left
+        else
+            dy = delta.y > 0 ? 1 : -1;   // up/down (screen coords)
+
+        grid.TrySwapInDirection(this, dx, dy);
+    }
+
+    // Obstacles are not moveable
     public bool IsMoveable()
     {
         return type != Grid.PieceType.ICEOBS
