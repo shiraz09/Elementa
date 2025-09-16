@@ -458,7 +458,6 @@ public class Grid : MonoBehaviour
     {
         if (activeAbility != null)
         {
-            UseActiveAbilityOn(piece);
             return;
         }
         // אם תרצי – אפשר לחסום בזמן פתיחה:
@@ -474,6 +473,12 @@ public class Grid : MonoBehaviour
 
     public void ReleasePiece()
     {
+        if (activeAbility != null)
+        {
+            pressedPiece = null;
+            enteredPiece = null;
+            return;
+        }
         if (pressedPiece != null && enteredPiece != null && IsAdjacent(pressedPiece, enteredPiece))
             SwapPieces(pressedPiece, enteredPiece);
 
