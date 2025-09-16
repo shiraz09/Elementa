@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Piece : MonoBehaviour, IPointerClickHandler
+public class Piece : MonoBehaviour
 {
     public int x, y;
     private GamePiece gp;
@@ -14,9 +14,5 @@ public class Piece : MonoBehaviour, IPointerClickHandler
         gp = GetComponent<GamePiece>();
         gp.Init(_x, _y, b, _type);
        
-    }
-    public void OnPointerClick(PointerEventData e)
-    {
-        if (board != null) board.UseActiveAbilityOn(gp);
     }
 }

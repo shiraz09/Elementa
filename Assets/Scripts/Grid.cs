@@ -560,7 +560,7 @@ public class Grid : MonoBehaviour
         pieces[x, y] = null;
 
         // אנימציית "פיצוץ" קצרה ואז הורסים – ללא CanvasGroup
-        StartCoroutine(AnimateAndDestroy(piece, visual, animationComplete));
+        StartCoroutine(AnimateAndDestroyAbilities(piece, visual, animationComplete));
     }
 
     public void SwapPieces(GamePiece a, GamePiece b)
@@ -653,18 +653,7 @@ public class Grid : MonoBehaviour
     }
 
     // ————————————————————— Power-ups / Abilities —————————————————————
-    public enum TargetMode { None, Row, Column, Cell3x3, AllOfType }
-
-    public void EnterAbility(FlowerAbility ability) { activeAbility = ability; }
-
-    public void UseActiveAbilityOn(GamePiece piece)
-    {
-        if (activeAbility == null || piece == null) return;
-        FlowerAbility.AbilityMap[activeAbility.ability].Apply(this, piece.X, piece.Y, piece.Type);
-        activeAbility = null;
-        StartCoroutine(FillAndResolve());
-    }
-
+    
     public IEnumerator ClearRow(int y)
     {
         if (y < 0 || y >= yDim) yield break;
@@ -984,7 +973,7 @@ public class Grid : MonoBehaviour
         StartCoroutine(FillAndResolve());
     }
 
-    IEnumerator AnimateAndDestroy(GamePiece piece, ClearVisual visual, System.Action animationComplete = null)
+    IEnumerator AnimateAndDestroyAbilities(GamePiece piece, ClearVisual visual, System.Action animationComplete = null)
     {
         if (piece == null) yield break;
 
