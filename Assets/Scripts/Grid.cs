@@ -894,6 +894,7 @@ public class Grid : MonoBehaviour
     {
         StopAllCoroutines();
     }
+<<<<<<< Updated upstream
     private System.Collections.IEnumerator AnimateAndDestroy(GamePiece p, bool isObstacle = false)
     {
         if (p == null) yield break;
@@ -956,5 +957,13 @@ public void TrySwapInDirection(GamePiece from, int dx, int dy)
     pressedPiece = from;
     enteredPiece = neighbor;
     ReleasePiece();
+=======
+    public bool ApplyAbility(FlowerAbility ab, GamePiece piece)
+{
+    if (ab == null || piece == null) return false;
+    FlowerAbility.AbilityMap[ab.ability].Apply(this, piece.X, piece.Y, piece.Type);
+    StartCoroutine(FillAndResolve());
+    return true;
+>>>>>>> Stashed changes
 }
 }
