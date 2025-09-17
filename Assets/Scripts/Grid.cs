@@ -219,9 +219,24 @@ public class Grid : MonoBehaviour
             var ob = p.GetComponent<ObstaclePiece>();
             if (ob != null)
             {
+                if (AudioManager.Instance != null)
+                {
+                    if (p.Type == PieceType.ICEOBS)
+                        AudioManager.Instance.PlaySound("ice_hit");
+                    else
+                        AudioManager.Instance.PlaySound("grass_hit");
+                }
+
                 bool destroyed = ob.Damage(amount);
                 if (destroyed)
                 {
+                     if (AudioManager.Instance != null)
+                    {
+                        if (p.Type == PieceType.ICEOBS)
+                            AudioManager.Instance.PlaySound("ice_break");
+                        else
+                            AudioManager.Instance.PlaySound("grass_hit");
+                    }
                     pieces[x, y] = null;                 // לפנות סלוט קודם
                     StartCoroutine(AnimateAndDestroy(p)); // אנימציה ואז Destroy
                 }
@@ -270,7 +285,11 @@ public class Grid : MonoBehaviour
         if (currentMoves <= 0) return false;
         currentMoves--;
         gameUI?.UpdateUI();
-        if (currentMoves <= 3) gameUI?.ShowNoMovesWarning();
+        if (currentMoves <= 5){
+            gameUI?.ShowNoMovesWarning();
+            
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("time_warning");}
         if (currentMoves <= 0)
         {
             Debug.Log("No moves left!");
@@ -288,11 +307,20 @@ public class Grid : MonoBehaviour
         int add = 0;
         switch (matchSize)
         {
-            case 3: add = match3Score; break;
-            case 4: add = match4Score; break;
-            case 5: add = match5Score; break;
+            case 3: add = match3Score; 
+             if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("match");
+            break;
+            case 4: add = match4Score;
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("match"); break;
+            case 5: add = match5Score;
+             if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("match"); break;
             default:
                 if (matchSize > 5) add = match5Score + ((matchSize - 5) * 20);
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.PlaySound("match");
                 break;
         }
 
@@ -337,6 +365,14 @@ public class Grid : MonoBehaviour
         Debug.Log($"Final Score: {currentScore}");
         Debug.Log($"Stars: {finalStars}/3");
         bool win = finalStars > 0;
+        
+        if (AudioManager.Instance != null)
+        {
+            if (win)
+                AudioManager.Instance.PlaySound("win");
+            else
+                AudioManager.Instance.PlaySound("lose");
+        }
 
         if (LevelResultUI.Instance)
         {
@@ -407,6 +443,7 @@ public class Grid : MonoBehaviour
                 moved = true;
             }
         }
+        
 
         return moved;
     }
@@ -552,6 +589,25 @@ public class Grid : MonoBehaviour
         GamePiece piece = pieces[x, y];
         if (piece == null) return;
 
+        if (AudioManager.Instance != null && awardResource)
+        {
+            switch (piece.Type)
+            {
+                case PieceType.EARTH:
+                    AudioManager.Instance.PlaySound("earth_clear");
+                    break;
+                case PieceType.GRASS:
+                    AudioManager.Instance.PlaySound("grass_clear");
+                    break;
+                case PieceType.WATER:
+                    AudioManager.Instance.PlaySound("water_clear");
+                    break;
+                case PieceType.SUN:
+                    AudioManager.Instance.PlaySound("sun_clear");
+                    break;
+            }
+        }
+
         // לא להעניק ריסורסים על מכשולים
         if (awardResource && bank != null &&
             piece.Type != PieceType.ICEOBS && piece.Type != PieceType.GRASSOBS)
@@ -579,6 +635,7 @@ public class Grid : MonoBehaviour
         if (a == null || b == null) return;
         if (!a.IsMoveable() || !b.IsMoveable()) return;
         if (!IsAdjacent(a, b)) return;
+
 
         int ax = a.X, ay = a.Y;
         int bx = b.X, by = b.Y;
@@ -624,7 +681,10 @@ public class Grid : MonoBehaviour
     private void ClearAndRefill()
     {
         if (ClearAllValidMatches())
+        {
+          
             StartCoroutine(FillAndResolve());
+        }
     }
 
     private HashSet<GamePiece> FindAllMatchesOnBoard()
@@ -844,6 +904,8 @@ public class Grid : MonoBehaviour
     public void ShuffleBoard()
     {
         Debug.Log("Shuffling board…");
+        if (AudioManager.Instance != null)
+        AudioManager.Instance.PlaySound("refill");
 
         List<GamePiece> movable = new List<GamePiece>();
 
@@ -897,6 +959,8 @@ public class Grid : MonoBehaviour
     public void ManualRefreshBoard()
     {
         Debug.Log("Manual board refresh requested.");
+         if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySound("no_moves");
         ShuffleBoard();
     }
 

@@ -811,6 +811,153 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1456907826}
   m_CullTransparentMesh: 1
+--- !u!1 &1798797445
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1798797447}
+  - component: {fileID: 1798797446}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1798797446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798797445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ea498634afacac46b672a2ff3e0283e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  soundEffects:
+  - name: refill
+    clip: {fileID: 8300000, guid: 30efacd908896b948ac07a6414bc6bff, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: no_moves
+    clip: {fileID: 8300000, guid: 7b4404691e4a85747812dda60ef4b21e, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: grass_break
+    clip: {fileID: 8300000, guid: 7408e409a4e79de4387a1ae24cd3f992, type: 3}
+    volume: 1
+    pitch: 2
+    loop: 0
+    source: {fileID: 0}
+  - name: shuffle
+    clip: {fileID: 8300000, guid: 30efacd908896b948ac07a6414bc6bff, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: water_clear
+    clip: {fileID: 8300000, guid: 0282263621d78394b861c5fca407dd7d, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: earth_clear
+    clip: {fileID: 8300000, guid: 4124cff21c44dea46b5c1713f2d51593, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: sun_clear
+    clip: {fileID: 8300000, guid: 6263695594f37424daf419eb2b6c5366, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: grass_hit
+    clip: {fileID: 8300000, guid: 7408e409a4e79de4387a1ae24cd3f992, type: 3}
+    volume: 1
+    pitch: 2
+    loop: 0
+    source: {fileID: 0}
+  - name: popup_open
+    clip: {fileID: 8300000, guid: f851b8f7fbc35af4eb2a3b65e5f14e1a, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: star_appear
+    clip: {fileID: 8300000, guid: e7dda18cf13df524b99c7c76af96f144, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: button_click
+    clip: {fileID: 8300000, guid: 6378ae03db2989f4c9e2a1784cd73c63, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: grass_clear
+    clip: {fileID: 8300000, guid: f3a70df7fc22ed14fb9627c78cfe187a, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: win
+    clip: {fileID: 8300000, guid: 9e46b0592e8fc0b4daaab8d703a4f0b7, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: lose
+    clip: {fileID: 8300000, guid: caa21ce0a2946464f85acc297e5d969e, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: ice_hit
+    clip: {fileID: 8300000, guid: 40a9496bd3a7e3d43a8ddb068d7c180a, type: 3}
+    volume: 1
+    pitch: 2
+    loop: 0
+    source: {fileID: 0}
+  - name: star_appear
+    clip: {fileID: 8300000, guid: e7dda18cf13df524b99c7c76af96f144, type: 3}
+    volume: 1
+    pitch: 2
+    loop: 0
+    source: {fileID: 0}
+  backgroundMusic:
+  - {fileID: 8300000, guid: 2264755adebab064da768a1deafd0bcd, type: 3}
+  musicSource: {fileID: 0}
+  masterVolume: 1
+  sfxVolume: 1
+  musicVolume: 0.26
+--- !u!4 &1798797447
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798797445}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 481.49664, y: 1079.6244, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1949563714
 GameObject:
   m_ObjectHideFlags: 0
@@ -938,3 +1085,4 @@ SceneRoots:
   - {fileID: 214269352}
   - {fileID: 660121128}
   - {fileID: 1256849943}
+  - {fileID: 1798797447}

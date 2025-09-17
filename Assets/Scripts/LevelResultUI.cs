@@ -203,6 +203,9 @@ public class LevelResultUI : MonoBehaviour
     void Open(string title, Color titleColor, int score, bool showNext, int stars)
     {
         gameObject.SetActive(true);
+         // הוסף סאונד פתיחת פופאפ
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySound("popup_open");
         ResetInteractivity();
 
         // עיצוב הרקע של הפופאפ
@@ -277,10 +280,16 @@ public class LevelResultUI : MonoBehaviour
             if (!t) continue;
             _seq.AppendInterval(starPopDelay);
             _seq.Append(t.DOScale(1.2f, 0.3f).SetEase(starEase));
+             if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("star_appear");
             _seq.Join(t.DORotate(new Vector3(0, 0, 20), 0.3f, RotateMode.Fast).SetEase(Ease.OutQuad));
             _seq.Append(t.DOScale(1f, 0.15f).SetEase(Ease.OutBounce));
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("star_appear");
             _seq.Join(t.DORotate(Vector3.zero, 0.15f, RotateMode.Fast).SetEase(Ease.OutQuad));
             _seq.Append(t.DOPunchScale(Vector3.one * 0.1f, 0.2f, 1, 0.8f));
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("star_appear");
         }
         
         // אנימציה לכפתורים
@@ -314,6 +323,9 @@ public class LevelResultUI : MonoBehaviour
     // ---------- ניווט עם אנימציית לחיצה ----------
     void OnRetry()
     {
+        if (AudioManager.Instance != null)
+        AudioManager.Instance.PlaySound("click");
+        
         PlayButtonAnimation(retryBtn.transform, () => {
             SceneManager.LoadScene(mainScene);
         });
@@ -321,6 +333,9 @@ public class LevelResultUI : MonoBehaviour
 
     void OnHome()
     {
+        if (AudioManager.Instance != null)
+        AudioManager.Instance.PlaySound("click");
+
         PlayButtonAnimation(homeBtn.transform, () => {
             SceneManager.LoadScene(levelSelectScene);
         });
@@ -328,6 +343,9 @@ public class LevelResultUI : MonoBehaviour
 
     void OnNext()
     {
+        if (AudioManager.Instance != null)
+        AudioManager.Instance.PlaySound("click");
+
         PlayButtonAnimation(nextBtn.transform, () => {
             int next = _currentLevel + 1;
             PlayerPrefs.SetInt("current_level", next);

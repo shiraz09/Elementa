@@ -53,6 +53,8 @@ public class HomeUI : MonoBehaviour
         // מוזיקה: טען העדפה ושקף לאודיו/אייקון
         musicOn = PlayerPrefs.GetInt(MUSIC_PREF, 1) == 1;
         ApplyMusicState();
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayMusic(0);
     }
 
     // -------- Buttons --------
