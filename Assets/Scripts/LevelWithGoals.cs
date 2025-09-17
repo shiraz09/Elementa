@@ -64,6 +64,13 @@ public class LevelWithGoals : Level
 
     private void TryCheckWin()
     {
+        // אם יש 3 כוכבים – אין טעם להמשיך
+        if (GetStarCount() == 3)
+        {
+            GameWin();
+            return;
+        }
+
         if (AllGoalsDone() && currentScore >= score1Star)
             GameWin();
     }

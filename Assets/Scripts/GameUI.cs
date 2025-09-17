@@ -10,45 +10,50 @@ public class GameUI : MonoBehaviour
     [SerializeField] private TMP_Text movesText;
     [SerializeField] private TMP_Text scoreText;
 
-    // כוכבים – תמונה אחת שמחליפה ספרייט
+    [Header("Stars")]
     [SerializeField] private Image starsImage;
-
-    // 4 ספרייטים: [0]=0 כוכבים, [1]=⭐, [2]=⭐⭐, [3]=⭐⭐⭐
     [SerializeField] private Sprite[] starStates = new Sprite[4];
 
     [Header("Goals UI")]
-    [SerializeField] private RectTransform goalsContainer; // עם VerticalLayoutGroup
-    [SerializeField] private GameObject goalRowPrefab;     // פריפאב עם TMP_Text
+    [SerializeField] private RectTransform goalsContainer;
+    [SerializeField] private GameObject goalRowPrefab;
+
+    [Header("Piece Icons (mapping)")]
+    [SerializeField] private List<PieceIcon> pieceIcons = new List<PieceIcon>();
 
     [Header("Animation Settings")]
     [SerializeField] private float starAnimationDuration = 0.5f;
     [SerializeField] private float scoreAnimationDuration = 0.3f;
 
     [Header("Message Display (optional)")]
-    [SerializeField] private MessageDisplay messageDisplay; // אם יש אצלך
+    [SerializeField] private MessageDisplay messageDisplay;
 
     private Grid grid;
-    private readonly List<TMP_Text> goalLabels = new();
+    private readonly List<GoalUIItem> goalItems = new List<GoalUIItem>();
+    private Dictionary<Grid.PieceType, Sprite> iconMap;
 
     private int lastScore = -1;
     private int lastStars = -1;
-
-    private Coroutine scoreAnimCo;
-    private Coroutine starAnimCo;
+    private Coroutine scoreAnimCo, starAnimCo;
 
     private void Awake()
     {
-
-    #if UNITY_2023_1_OR_NEWER
-        if (grid == null) grid = FindFirstObjectByType<Grid>();   // מהיר ומומלץ
-    #else
-        if (grid == null) grid = FindObjectOfType<Grid>();        // תאימות לאחור
-    #endif
-
+#if UNITY_2023_1_OR_NEWER
+        grid = FindFirstObjectByType<Grid>();
+#else
+        grid = FindObjectOfType<Grid>();
+#endif
         if (starsImage != null)
         {
             starsImage.color = Color.white;
             starsImage.preserveAspect = true;
+        }
+
+        iconMap = new Dictionary<Grid.PieceType, Sprite>();
+        foreach (var p in pieceIcons)
+        {
+            if (!iconMap.ContainsKey(p.type) && p.sprite != null)
+                iconMap.Add(p.type, p.sprite);
         }
     }
 
@@ -61,6 +66,13 @@ public class GameUI : MonoBehaviour
             return;
         }
 
+        if (goalsContainer != null && goalItems.Count == 0)
+        {
+            goalItems.Clear();
+            var found = goalsContainer.GetComponentsInChildren<GoalUIItem>(true);
+            goalItems.AddRange(found);
+        }
+
         UpdateUI(force: true);
     }
 
@@ -69,25 +81,45 @@ public class GameUI : MonoBehaviour
         UpdateUI();
     }
 
-    // ---------- Public API ----------
-
     public void ShowGoals(List<CollectGoal> goals)
     {
-        if (!goalsContainer || !goalRowPrefab) return;
+        if (goalsContainer == null) return;
 
-        foreach (Transform t in goalsContainer) Destroy(t.gameObject);
-        goalLabels.Clear();
+        bool hasGoals = goals != null && goals.Count > 0;
 
-        for (int i = 0; i < goals.Count; i++)
+        // הסתר/הצג את כל הקונטיינר לפי מצב המשימות
+        goalsContainer.gameObject.SetActive(hasGoals);
+
+        if (!hasGoals)
         {
-            var row = Instantiate(goalRowPrefab, goalsContainer);
-            var label = row.GetComponentInChildren<TMP_Text>();
-            if (!label)
+            // אין משימות: לכבות ילדים קיימים אם יש
+            foreach (Transform t in goalsContainer)
+                t.gameObject.SetActive(false);
+            return;
+        }
+
+        if (goalRowPrefab != null)
+        {
+            foreach (Transform t in goalsContainer) Destroy(t.gameObject);
+            goalItems.Clear();
+
+            for (int i = 0; i < goals.Count; i++)
             {
-                Debug.LogWarning("GameUI: goalRowPrefab must contain a TMP_Text.");
-                continue;
+                var go = Instantiate(goalRowPrefab, goalsContainer);
+                var item = go.GetComponentInChildren<GoalUIItem>(true);
+                if (item != null) goalItems.Add(item);
             }
-            goalLabels.Add(label);
+        }
+        else
+        {
+            if (goalItems.Count == 0)
+            {
+                var found = goalsContainer.GetComponentsInChildren<GoalUIItem>(true);
+                goalItems.AddRange(found);
+            }
+
+            for (int i = 0; i < goalItems.Count; i++)
+                goalItems[i].gameObject.SetActive(i < goals.Count);
         }
 
         UpdateGoals(goals);
@@ -95,15 +127,50 @@ public class GameUI : MonoBehaviour
 
     public void UpdateGoals(List<CollectGoal> goals)
     {
-        if (goals == null) return;
+        if (goalsContainer == null) return;
 
-        int count = Mathf.Min(goals.Count, goalLabels.Count);
+        bool hasGoals = goals != null && goals.Count > 0;
+        goalsContainer.gameObject.SetActive(hasGoals);
+        if (!hasGoals) return;
+
+        int count = Mathf.Min(goals.Count, goalItems.Count);
         for (int i = 0; i < count; i++)
         {
             var g = goals[i];
-            var label = goalLabels[i];
-            if (label) label.text = $"{g.type}: {g.current}/{g.target}";
+            var item = goalItems[i];
+
+            Sprite s = null;
+            iconMap?.TryGetValue(g.type, out s);
+            item.UpdateGoal(s, g.current, g.target);
+            item.gameObject.SetActive(true);
         }
+
+        for (int i = count; i < goalItems.Count; i++)
+            goalItems[i].gameObject.SetActive(false);
+    }
+
+    public void ShowStarEarnedMessage(int starCount)
+    {
+        Debug.Log($"⭐ Star {starCount} earned!");
+        messageDisplay?.ShowStarMessage(starCount);
+    }
+
+    public void ShowNoMovesWarning()
+    {
+        Debug.Log("⚠️ Only a few moves left!");
+        messageDisplay?.ShowWarningMessage();
+    }
+
+    public void ShowLevelComplete(int finalScore, int starsEarned)
+    {
+        Debug.Log($"🎉 Level Complete! Score={finalScore:N0}, Stars={starsEarned}/3");
+        messageDisplay?.ShowLevelCompleteMessage(finalScore, starsEarned);
+    }
+
+    public void SetGrid(Grid g)
+    {
+        grid = g;
+        UpdateUI(force: true);
     }
 
     public void UpdateUI(bool force = false)
@@ -115,32 +182,11 @@ public class GameUI : MonoBehaviour
         UpdateStarsDisplay(force);
     }
 
-    public void ShowStarEarnedMessage(int starCount)
-    {
-        Debug.Log($"⭐ Star {starCount} earned! ⭐");
-        messageDisplay?.ShowStarMessage(starCount);
-    }
-
-    public void ShowNoMovesWarning()
-    {
-        Debug.Log("⚠️ Warning: Only a few moves left!");
-        messageDisplay?.ShowWarningMessage();
-    }
-
-    public void ShowLevelComplete(int finalScore, int starsEarned)
-    {
-        Debug.Log($"🎉 Level Complete! Score={finalScore:N0}, Stars={starsEarned}/3");
-        messageDisplay?.ShowLevelCompleteMessage(finalScore, starsEarned);
-    }
-
-    // ---------- Internals ----------
-
     private void UpdateMovesDisplay()
     {
         if (!movesText) return;
 
         movesText.text = $"Moves: {grid.currentMoves}";
-
         if (grid.currentMoves <= 5)       movesText.color = Color.red;
         else if (grid.currentMoves <= 10) movesText.color = Color.yellow;
         else                              movesText.color = Color.white;
@@ -165,8 +211,7 @@ public class GameUI : MonoBehaviour
 
     private void UpdateStarsDisplay(bool force)
     {
-        if (!starsImage) return;
-        if (starStates == null || starStates.Length < 4) return;
+        if (!starsImage || starStates == null || starStates.Length < 4) return;
 
         int curStars = Mathf.Clamp(grid.GetStarRating(), 0, 3);
 
@@ -180,13 +225,11 @@ public class GameUI : MonoBehaviour
         if (curStars != lastStars)
         {
             starsImage.sprite = starStates[curStars];
-
             if (curStars > lastStars)
             {
                 if (starAnimCo != null) StopCoroutine(starAnimCo);
                 starAnimCo = StartCoroutine(AnimateStarEarned());
             }
-
             lastStars = curStars;
         }
     }
@@ -230,10 +273,10 @@ public class GameUI : MonoBehaviour
         tr.localScale = baseScale;
     }
 
-    // מאפשר הזרקת Grid ידנית אם תרצי
-    public void SetGrid(Grid g)
+    [System.Serializable]
+    public class PieceIcon
     {
-        grid = g;
-        UpdateUI(force: true);
+        public Grid.PieceType type;
+        public Sprite sprite;
     }
 }

@@ -25,11 +25,14 @@ public class LevelDirector : MonoBehaviour
             : LevelGenerator.Generate(stageIndex);
 
         ApplySpec(spec);
+
+        // חשוב: לעדכן גם את ה-UI (ולכבות אותו כשאין משימות)
+        grid.gameUI?.ShowGoals(level.goals);
+        grid.gameUI?.UpdateUI(true);
     }
 
     private void ApplySpec(LevelSpec spec)
     {
-        // Grid
         grid.baseMoves = spec.maxMoves;
         grid.star1Score = spec.score1Star;
         grid.star2Score = spec.score2Star;
@@ -37,7 +40,6 @@ public class LevelDirector : MonoBehaviour
         grid.maxObstacles = spec.maxObstacles;
         grid.obstacleSpawnChance = spec.obstacleSpawnChance;
 
-        // Level
         level.stageIndex = spec.stageIndex;
         level.score1Star = spec.score1Star;
         level.score2Star = spec.score2Star;
