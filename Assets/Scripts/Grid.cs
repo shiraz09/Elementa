@@ -104,7 +104,6 @@ public class Grid : MonoBehaviour
                 RectTransform rt = bg.GetComponent<RectTransform>();
                 if (rt)
                 {
-                    rt.sizeDelta = new Vector2(cellSize, cellSize);
                     rt.anchoredPosition = GetUIPos(x, y);
                 }
                 var img = bg.GetComponent<Image>();
@@ -392,7 +391,6 @@ public class Grid : MonoBehaviour
                 RectTransform rt = go.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.sizeDelta = new Vector2(cellSize, cellSize);
                     rt.anchoredPosition = GetUIPos(x, -1);
                 }
                 GamePiece gp = go.GetComponent<GamePiece>();
@@ -430,7 +428,6 @@ public class Grid : MonoBehaviour
         if (rt != null)
         {
             rt.localScale = Vector3.one;
-            rt.sizeDelta = new Vector2(cellSize, cellSize);
             rt.anchoredPosition = spawnAbove ? GetUIPos(x, -1) : GetUIPos(x, y);
         }
 
