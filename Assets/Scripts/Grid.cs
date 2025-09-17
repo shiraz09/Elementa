@@ -5,6 +5,8 @@ using DG.Tweening;
 using DG.Tweening.Core;
 using UnityEngine.UI;
 
+
+
 public class Grid : MonoBehaviour
 {
     // Piece types (includes obstacles)
@@ -334,9 +336,13 @@ public class Grid : MonoBehaviour
         Debug.Log("=== LEVEL COMPLETE ===");
         Debug.Log($"Final Score: {currentScore}");
         Debug.Log($"Stars: {finalStars}/3");
+        bool win = finalStars > 0;
 
-        gameUI?.ShowLevelComplete(currentScore, finalStars);
-        level?.OnLevelComplete(currentScore, finalStars);
+        if (LevelResultUI.Instance)
+        {
+            if (win) LevelResultUI.Instance.ShowWin(currentScore, finalStars);
+            else     LevelResultUI.Instance.ShowLose(currentScore);
+        }
     }
 
     // ————————————————————— Fill / Gravity / Match —————————————————————
@@ -651,6 +657,13 @@ public class Grid : MonoBehaviour
         }
         else
         {
+                    // אחרי שאין עוד התאמות
+            if (GetObstacleCount() == 0)
+            {
+                GameOver();   // ניצחון
+                yield break;
+            }
+            
             yield return new WaitForSeconds(0.1f);
             CheckAndRefreshBoard();
         }
@@ -1099,45 +1112,46 @@ private bool CausesMatchAt(int x, int y, PieceType t)
     return false;
 }
 
-// פתיחת לוח עם "נפילה" מלמעלה וללא מאצ'ים או ניקוד/ניקוי אוטומטי
-private IEnumerator IntroPopulateBoardWithoutMatches()
-{
-    isIntroFilling = true;
-
-    var regularTypes = GetRegularTypes();
-
-    for (int y = 0; y < yDim; y++)
+    // פתיחת לוח עם "נפילה" מלמעלה וללא מאצ'ים או ניקוד/ניקוי אוטומטי
+    private IEnumerator IntroPopulateBoardWithoutMatches()
     {
-        for (int x = 0; x < xDim; x++)
+        isIntroFilling = true;
+
+        var regularTypes = GetRegularTypes();
+
+        for (int y = 0; y < yDim; y++)
         {
-            // בוחרים סוג שלא יוצר מאצ' מיידי
-            List<PieceType> candidates = new List<PieceType>(regularTypes);
-            // ערבוב קל כדי לגוון
-            for (int i = 0; i < candidates.Count; i++)
+            for (int x = 0; x < xDim; x++)
             {
-                int r = Random.Range(i, candidates.Count);
-                (candidates[i], candidates[r]) = (candidates[r], candidates[i]);
-            }
-
-            PieceType chosen = candidates[0];
-            foreach (var t in candidates)
-            {
-                if (!CausesMatchAt(x, y, t))
+                // בוחרים סוג שלא יוצר מאצ' מיידי
+                List<PieceType> candidates = new List<PieceType>(regularTypes);
+                // ערבוב קל כדי לגוון
+                for (int i = 0; i < candidates.Count; i++)
                 {
-                    chosen = t;
-                    break;
+                    int r = Random.Range(i, candidates.Count);
+                    (candidates[i], candidates[r]) = (candidates[r], candidates[i]);
                 }
+
+                PieceType chosen = candidates[0];
+                foreach (var t in candidates)
+                {
+                    if (!CausesMatchAt(x, y, t))
+                    {
+                        chosen = t;
+                        break;
+                    }
+                }
+
+                // יצירה מעל הלוח (y = -1) + אנימציית נפילה למיקום
+                SpawnNewPiece(x, y, chosen, spawnAbove: true);
             }
 
-            // יצירה מעל הלוח (y = -1) + אנימציית נפילה למיקום
-            SpawnNewPiece(x, y, chosen, spawnAbove: true);
+            // דיליי קטן בין שורות לנראות "גלישה"
+            yield return new WaitForSeconds(fillTime);
         }
 
-        // דיליי קטן בין שורות לנראות "גלישה"
-        yield return new WaitForSeconds(fillTime);
+        isIntroFilling = false;
     }
 
-    isIntroFilling = false;
-}
 
 }
