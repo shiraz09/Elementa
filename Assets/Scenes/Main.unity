@@ -755,6 +755,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 604704555}
+  - component: {fileID: 604704556}
   m_Layer: 5
   m_Name: GoalsContainer
   m_TagString: Untagged
@@ -778,9 +779,35 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -224, y: -265}
-  m_SizeDelta: {x: 248.7888, y: 90}
+  m_AnchoredPosition: {x: -224.9, y: -271.90955}
+  m_SizeDelta: {x: 155.5092, y: 103.8192}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &604704556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 604704554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 60.86
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &632046558
 GameObject:
   m_ObjectHideFlags: 0
@@ -1123,7 +1150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelDirector
   grid: {fileID: 1493153525}
   level: {fileID: 1489475281}
-  stageIndex: 10
+  stageIndex: 1
   useFixedSeed: 0
   seed: 12345
 --- !u!4 &1093176105
