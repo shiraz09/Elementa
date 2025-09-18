@@ -304,6 +304,10 @@ public class Grid : MonoBehaviour
 
     public void AddMatchScore(int matchSize)
     {
+        // אם כבר השגנו 3 כוכבים והמשחק כבר נגמר, לא מוסיפים עוד ניקוד
+        if (gameOver || GetStarRating() >= 3) 
+            return;
+            
         int add = 0;
         switch (matchSize)
         {
@@ -713,6 +717,25 @@ public class Grid : MonoBehaviour
         HashSet<GamePiece> more = FindAllMatchesOnBoard();
         if (more.Count >= 3)
         {
+            // Add points for matches created by falling elements
+            int oldStars = GetStarRating();
+            AddMatchScore(more.Count);
+            int newStars = GetStarRating();
+            
+            // Show star earned message if a new star is earned from cascading matches
+            if (newStars > oldStars && gameUI != null)
+                gameUI.ShowStarEarnedMessage(newStars);
+                
+            // Check for win condition when 3 stars are earned from cascades
+            if (newStars == 3 && level != null)
+            {
+                // Cast to LevelWithGoals to access TryCheckWin method
+                if (level is LevelWithGoals levelWithGoals)
+                    levelWithGoals.TryCheckWin();
+                else
+                    GameOver(); // End game if 3 stars earned
+            }
+            
             foreach (GamePiece p in more)
                 if (p != null) RemoveAt(p.X, p.Y, true);
             yield return new WaitForSeconds(0.05f);
@@ -721,7 +744,7 @@ public class Grid : MonoBehaviour
         else
         {
                     // אחרי שאין עוד התאמות
-            if (GetObstacleCount() == 0)
+            if (currentMoves == 0)
             {
                 GameOver();   // ניצחון
                 yield break;
@@ -1053,6 +1076,20 @@ public class Grid : MonoBehaviour
 
     public IEnumerator ApplyAbility(FlowerAbility ab, GamePiece piece)
     {
+        // Add points when using an ability (powerup)
+        currentScore += 150;
+        
+        // הפעלת ability נחשבת כמהלך
+        UseMove();
+        
+        gameUI?.UpdateUI();
+        
+        // Check if stars increased after using powerup
+        int oldStars = GetStarRating();
+        int newStars = GetStarRating();
+        if (newStars > oldStars)
+            gameUI?.ShowStarEarnedMessage(newStars);
+            
         yield return StartCoroutine(FlowerAbility.AbilityMap[ab.ability].Apply(this, piece.X, piece.Y, piece.Type));
         StartCoroutine(FillAndResolve());
     }

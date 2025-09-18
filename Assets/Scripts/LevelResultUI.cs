@@ -44,9 +44,21 @@ public class LevelResultUI : MonoBehaviour
     public Color starLitColor = new Color(1f, 0.84f, 0.35f, 1f);      // זהב
     public Color starOffColor = new Color(0.78f, 0.81f, 0.86f, 1f);   // אפור בהיר
 
+    [Header("Game Protection")]
+    // מינימום הזמן בשניות מתחילת המשחק לפני שניתן להציג פופאפ ניצחון/הפסד
+    public float minPlayTimeBeforePopup = 2.5f;
+
+    // האם להציג התראה בלוג במקרה של ניסיון להציג פופאפ מוקדם מדי
+    public bool showEarlyPopupWarning = true;
+
+    private bool _popupShown = false;        // דגל שמציין האם כבר הוצג פופאפ
+    private float _levelStartTime;           // הזמן בו התחיל השלב
+
     Image[] _stars;
     Sequence _seq;
     int _currentLevel;
+
+    private Grid _grid;
 
     void Awake()
     {
@@ -63,11 +75,17 @@ public class LevelResultUI : MonoBehaviour
             
         if (nextBtn && nextBtnImage == null) 
             nextBtnImage = nextBtn.GetComponent<Image>();
+        
+         _grid = FindObjectOfType<Grid>();
     }
 
     void Start()
     {
         _currentLevel = PlayerPrefs.GetInt("current_level", 1);
+        _levelStartTime = Time.time;  // שמירת זמן תחילת המשחק
+        _popupShown = false;          // איפוס דגל הפופאפ
+        
+        Debug.Log($"Level {_currentLevel} started at time: {_levelStartTime}");
         
         // הגדרת מאזינים לכפתורים
          if (retryBtn) {
@@ -137,6 +155,29 @@ public class LevelResultUI : MonoBehaviour
     // ---------- API שהמשחק קורא ----------
     public void ShowWin(int score, int stars)
     {
+        // בדיקה שלא הוצג כבר פופאפ
+        if (_popupShown)
+        {
+            Debug.LogWarning("Win popup already shown, ignoring duplicate call.");
+            return;
+        }
+        
+        // בדיקת זמן מינימלי של המשחק לפני הצגת הפופאפ
+        float elapsedTime = Time.time - _levelStartTime;
+        if (elapsedTime < minPlayTimeBeforePopup)
+        {
+            if (showEarlyPopupWarning)
+            {
+                Debug.LogWarning($"Win popup attempted to show too early ({elapsedTime:F1}s). " +
+                    $"Required minimum play time: {minPlayTimeBeforePopup}s. " +
+                    $"Ignoring this win.");
+            }
+            return;
+        }
+
+        // סימון שהוצג פופאפ כדי למנוע כפילויות
+        _popupShown = true;
+        
         // עצירת זמן המשחק
         Time.timeScale = 0f;
         
@@ -145,6 +186,8 @@ public class LevelResultUI : MonoBehaviour
         
         // הצגת חלון עם הודעת ניצחון מותאמת
         string winTitle = GetWinTitle(stars);
+        
+        Debug.Log($"Showing WIN popup after {elapsedTime:F1}s of gameplay with {stars} stars.");
         
         Open(
             title: winTitle,
@@ -156,6 +199,29 @@ public class LevelResultUI : MonoBehaviour
 
     public void ShowLose(int score)
     {
+        // בדיקה שלא הוצג כבר פופאפ
+        if (_popupShown)
+        {
+            Debug.LogWarning("Lose popup already shown, ignoring duplicate call.");
+            return;
+        }
+        
+        // בדיקת זמן מינימלי של המשחק לפני הצגת הפופאפ
+        float elapsedTime = Time.time - _levelStartTime;
+        if (elapsedTime < minPlayTimeBeforePopup)
+        {
+            if (showEarlyPopupWarning)
+            {
+                Debug.LogWarning($"Lose popup attempted to show too early ({elapsedTime:F1}s). " +
+                    $"Required minimum play time: {minPlayTimeBeforePopup}s. " +
+                    $"Ignoring this loss.");
+            }
+            return;
+        }
+        
+        // סימון שהוצג פופאפ כדי למנוע כפילויות
+        _popupShown = true;
+        
         // עצירת זמן המשחק
         Time.timeScale = 0f;
         
@@ -165,6 +231,8 @@ public class LevelResultUI : MonoBehaviour
         // הצגת חלון עם הודעת הפסד מותאמת
         string loseTitle = GetLoseTitle();
         
+        Debug.Log($"Showing LOSE popup after {elapsedTime:F1}s of gameplay.");
+        
         Open(
             title: loseTitle,
             titleColor: loseTitleColor,
@@ -172,7 +240,6 @@ public class LevelResultUI : MonoBehaviour
             showNext: false,     // <<<< אין Next בהפסד
             stars: 0             // <<<< כוכבים כבויים
         );
-        
     }
     
     // הודעות ניצחון מגוונות לפי מספר הכוכבים
@@ -324,9 +391,13 @@ public class LevelResultUI : MonoBehaviour
     public void OnRetry()
     {
         if (AudioManager.Instance != null)
-        AudioManager.Instance.PlaySound("click");
+            AudioManager.Instance.PlaySound("click");
+        
+        // מניעת לחיצות כפולות
+        DisableAllButtons();
         
         PlayButtonAnimation(retryBtn.transform, () => {
+            Time.timeScale = 1f; // וודא שהמהירות מתאפסת
             SceneManager.LoadScene(mainScene);
         });
     }
@@ -334,9 +405,13 @@ public class LevelResultUI : MonoBehaviour
     public void OnHome()
     {
         if (AudioManager.Instance != null)
-        AudioManager.Instance.PlaySound("click");
+            AudioManager.Instance.PlaySound("click");
+            
+        // מניעת לחיצות כפולות
+        DisableAllButtons();
 
         PlayButtonAnimation(homeBtn.transform, () => {
+            Time.timeScale = 1f; // וודא שהמהירות מתאפסת
             SceneManager.LoadScene(levelSelectScene);
         });
     }
@@ -344,32 +419,64 @@ public class LevelResultUI : MonoBehaviour
     public void OnNext()
     {
         if (AudioManager.Instance != null)
-        AudioManager.Instance.PlaySound("click");
+            AudioManager.Instance.PlaySound("click");
+            
+        // מניעת לחיצות כפולות
+        DisableAllButtons();
 
         PlayButtonAnimation(nextBtn.transform, () => {
+            // Update current level and increment stage index for next level
             int next = _currentLevel + 1;
             PlayerPrefs.SetInt("current_level", next);
+            
+            // עדכון השלב הבא ב-LevelLoader ופתיחת שלבים חדשים
+            int nextStageIndex = _currentLevel + 1;
+            
+            // פתיחת השלב הבא במערכת ההתקדמות (יאפשר לראות אותו בבחירת השלבים)
+            ProgressManager.UnlockUpTo(nextStageIndex);
+            
+            // שמירה ב-PlayerPrefs כדי שה-LevelDirector יוכל לטעון את זה בשלב הבא
+            PlayerPrefs.SetInt("current_level_stageIndex", nextStageIndex);
+            
+            Debug.Log($"Updated and unlocked stage index to {nextStageIndex} for next level");
+            
             PlayerPrefs.Save();
-            SceneManager.LoadScene(mainScene);
+            Time.timeScale = 1f; // וודא שהמהירות מתאפסת
+            LevelLoader.LoadStage(nextStageIndex, mainScene); // משתמש ב-LevelLoader במקום לטעון ישירות
         });
+    }
+    
+    // מניעת לחיצות כפולות על כפתורים
+    private void DisableAllButtons()
+    {
+        if (retryBtn) retryBtn.interactable = false;
+        if (homeBtn) homeBtn.interactable = false;
+        if (nextBtn) nextBtn.interactable = false;
+        
+        if (overlay)
+        {
+            overlay.interactable = false;
+            overlay.blocksRaycasts = false;
+        }
     }
     
     // אנימציית לחיצת כפתור
     void PlayButtonAnimation(Transform buttonTransform, System.Action onComplete)
     {
-        
+        // וודא שכל הטווינים הקודמים מסתיימים
+        buttonTransform.DOKill();
         
         // אנימציית לחיצה
-        buttonTransform.DOScale(0.85f, 0.1f).SetEase(Ease.OutQuad).OnComplete(() => {
-            buttonTransform.DOScale(1.1f, 0.1f).SetEase(Ease.OutQuad).OnComplete(() => {
-                buttonTransform.DOScale(1f, 0.1f).SetEase(Ease.OutBounce).OnComplete(() => {
-                    overlay.interactable = true;
-                    // המתנה קצרה לפני מעבר
-                    DOVirtual.DelayedCall(0.1f, () => {
-                        onComplete?.Invoke();
-                    });
-                });
-            });
+        Sequence clickSeq = DOTween.Sequence().SetUpdate(true); // לרוץ גם אם Time.timeScale=0
+        
+        clickSeq.Append(buttonTransform.DOScale(0.85f, 0.1f).SetEase(Ease.OutQuad));
+        clickSeq.Append(buttonTransform.DOScale(1.1f, 0.1f).SetEase(Ease.OutQuad));
+        clickSeq.Append(buttonTransform.DOScale(1f, 0.1f).SetEase(Ease.OutBounce));
+        
+        // המתנה קצרה לפני מעבר סצנה
+        clickSeq.AppendInterval(0.2f);
+        clickSeq.OnComplete(() => {
+            onComplete?.Invoke();
         });
     }
 

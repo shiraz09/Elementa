@@ -245,6 +245,11 @@ public class GameUI : MonoBehaviour
         var tr = scoreText.transform;
         Vector3 baseScale = tr.localScale;
         Color baseColor = scoreText.color;
+        
+        // שמירת הצבע המקורי אם לא הוגדר
+        if (baseColor == Color.green) {
+            baseColor = Color.white;
+        }
 
         tr.localScale = baseScale * 1.2f;
         scoreText.color = Color.green;
@@ -255,6 +260,7 @@ public class GameUI : MonoBehaviour
             t += Time.deltaTime;
             float k = Mathf.Clamp01(t / scoreAnimationDuration);
             tr.localScale = Vector3.Lerp(baseScale * 1.2f, baseScale, k);
+            scoreText.color = Color.Lerp(Color.green, baseColor, k);
             yield return null;
         }
 

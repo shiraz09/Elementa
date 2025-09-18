@@ -62,11 +62,12 @@ public class LevelWithGoals : Level
         return true;
     }
 
-    private void TryCheckWin()
+    public void TryCheckWin()
     {
-        // אם יש 3 כוכבים – אין טעם להמשיך
+        // אם יש 3 כוכבים – מסיימים בניצחון מיד!
         if (GetStarCount() == 3)
         {
+            Debug.Log("Win triggered: 3 stars achieved!");
             GameWin();
             return;
         }
