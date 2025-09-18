@@ -76,7 +76,7 @@ public class Grid : MonoBehaviour
     public bool IsIntroFilling => isIntroFilling;
 
     // ————————————————————— Lifecycle —————————————————————
-    void Start()
+    void Awake()
     {
         // Build prefab dict
         piecePrefabDict = new Dictionary<PieceType, GameObject>();

@@ -321,7 +321,7 @@ public class LevelResultUI : MonoBehaviour
     }
 
     // ---------- ניווט עם אנימציית לחיצה ----------
-    void OnRetry()
+    public void OnRetry()
     {
         if (AudioManager.Instance != null)
         AudioManager.Instance.PlaySound("click");
@@ -331,7 +331,7 @@ public class LevelResultUI : MonoBehaviour
         });
     }
 
-    void OnHome()
+    public void OnHome()
     {
         if (AudioManager.Instance != null)
         AudioManager.Instance.PlaySound("click");
@@ -341,7 +341,7 @@ public class LevelResultUI : MonoBehaviour
         });
     }
 
-    void OnNext()
+    public void OnNext()
     {
         if (AudioManager.Instance != null)
         AudioManager.Instance.PlaySound("click");
