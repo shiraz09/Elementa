@@ -35,7 +35,7 @@ public class HomeUI : MonoBehaviour
 
     void Start()
     {
-        // מאזינים
+        // מאזינים לכפתורים
         if (playButton)     playButton.onClick.AddListener(OnPlay);
         if (infoButton)     infoButton.onClick.AddListener(ToggleInfo);
         if (infoCloseButton)infoCloseButton.onClick.AddListener(ToggleInfo);
@@ -52,11 +52,34 @@ public class HomeUI : MonoBehaviour
 
         // מוזיקה: טען העדפה ושקף לאודיו/אייקון
         musicOn = PlayerPrefs.GetInt(MUSIC_PREF, 1) == 1;
+        
+        // החלת ההגדרות על האודיו
         ApplyMusicState();
+        
+        // הפעלת מוזיקת רקע (רק אם הסאונד מופעל)
+        if (AudioManager.Instance != null && musicOn)
+            AudioManager.Instance.PlayMusic(0);
     }
 
     // -------- Buttons --------
     void OnPlay()
+    {
+        // השמעת צליל לחיצה
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySound("click");
+            
+        // מעבר לסצנת המשחק אחרי השהייה קצרה
+        if (!string.IsNullOrEmpty(gameSceneName))
+        {
+            // אפשרות 1: מעבר מיידי
+            // SceneManager.LoadScene(gameSceneName);
+            
+            // אפשרות 2: מעבר אחרי השהייה קצרה כדי לאפשר לצליל להישמע
+            Invoke("LoadGameScene", 0.2f);
+        }
+    }
+    
+    void LoadGameScene()
     {
         if (!string.IsNullOrEmpty(gameSceneName))
             SceneManager.LoadScene(gameSceneName);
@@ -64,6 +87,10 @@ public class HomeUI : MonoBehaviour
 
     void ToggleInfo()
     {
+        // השמעת צליל לחיצה
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySound("click");
+            
         if (!infoPanelRoot) return;
 
         bool open = !infoPanelRoot.activeSelf;
@@ -94,26 +121,51 @@ public class HomeUI : MonoBehaviour
 
     void ToggleMusic()
     {
+        // השמעת צליל לחיצה (רק אם הסאונד מופעל)
+        if (AudioManager.Instance != null && musicOn)
+            AudioManager.Instance.PlaySound("click");
+            
+        // החלפת מצב המוזיקה
         musicOn = !musicOn;
+        
+        // החלת השינויים
         ApplyMusicState();
-        PlayerPrefs.SetInt(MUSIC_PREF, musicOn ? 1 : 0);
-        PlayerPrefs.Save();
     }
 
     void ApplyMusicState()
     {
+        // השתקת המוזיקה המקומית (אם מוגדרת)
         if (musicSource)
         {
             musicSource.mute = !musicOn;
             if (musicOn && !musicSource.isPlaying) musicSource.Play();
         }
+        
+        // השתקת/הפעלת AudioManager (מוזיקה + אפקטים)
+        if (AudioManager.Instance != null)
+        {
+            // השתקת/הפעלת מוזיקת רקע
+            AudioManager.Instance.ToggleMusic(musicOn);
+            
+            // השתקת/הפעלת אפקטי סאונד
+            AudioManager.Instance.ToggleSFX(musicOn);
+            
+            // עדכון עוצמת הקול הכללית
+            AudioManager.Instance.masterVolume = musicOn ? 1f : 0f;
+            AudioManager.Instance.UpdateVolume();
+        }
         else
         {
-            // פולבאק – השתקה גלובלית אם אין מקור מוגדר
+            // פולבאק – השתקה גלובלית אם אין AudioManager
             AudioListener.pause = !musicOn;
         }
 
+        // החלפת האייקון של הכפתור
         if (soundBtnImg)
             soundBtnImg.sprite = musicOn ? soundOnSprite : soundOffSprite;
+            
+        // שמירת ההעדפה
+        PlayerPrefs.SetInt(MUSIC_PREF, musicOn ? 1 : 0);
+        PlayerPrefs.Save();
     }
 }

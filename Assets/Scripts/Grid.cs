@@ -5,6 +5,8 @@ using DG.Tweening;
 using DG.Tweening.Core;
 using UnityEngine.UI;
 
+
+
 public class Grid : MonoBehaviour
 {
     // Piece types (includes obstacles)
@@ -217,9 +219,24 @@ public class Grid : MonoBehaviour
             var ob = p.GetComponent<ObstaclePiece>();
             if (ob != null)
             {
+                if (AudioManager.Instance != null)
+                {
+                    if (p.Type == PieceType.ICEOBS)
+                        AudioManager.Instance.PlaySound("ice_hit");
+                    else
+                        AudioManager.Instance.PlaySound("grass_hit");
+                }
+
                 bool destroyed = ob.Damage(amount);
                 if (destroyed)
                 {
+                     if (AudioManager.Instance != null)
+                    {
+                        if (p.Type == PieceType.ICEOBS)
+                            AudioManager.Instance.PlaySound("ice_break");
+                        else
+                            AudioManager.Instance.PlaySound("grass_hit");
+                    }
                     pieces[x, y] = null;                 // לפנות סלוט קודם
                     StartCoroutine(AnimateAndDestroy(p)); // אנימציה ואז Destroy
                 }
@@ -268,7 +285,11 @@ public class Grid : MonoBehaviour
         if (currentMoves <= 0) return false;
         currentMoves--;
         gameUI?.UpdateUI();
-        if (currentMoves <= 3) gameUI?.ShowNoMovesWarning();
+        if (currentMoves <= 5){
+            gameUI?.ShowNoMovesWarning();
+            
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("time_warning");}
         if (currentMoves <= 0)
         {
             Debug.Log("No moves left!");
@@ -286,11 +307,20 @@ public class Grid : MonoBehaviour
         int add = 0;
         switch (matchSize)
         {
-            case 3: add = match3Score; break;
-            case 4: add = match4Score; break;
-            case 5: add = match5Score; break;
+            case 3: add = match3Score; 
+             if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("match");
+            break;
+            case 4: add = match4Score;
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("match"); break;
+            case 5: add = match5Score;
+             if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("match"); break;
             default:
                 if (matchSize > 5) add = match5Score + ((matchSize - 5) * 20);
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.PlaySound("match");
                 break;
         }
 
@@ -334,9 +364,21 @@ public class Grid : MonoBehaviour
         Debug.Log("=== LEVEL COMPLETE ===");
         Debug.Log($"Final Score: {currentScore}");
         Debug.Log($"Stars: {finalStars}/3");
+        bool win = finalStars > 0;
+        
+        if (AudioManager.Instance != null)
+        {
+            if (win)
+                AudioManager.Instance.PlaySound("win");
+            else
+                AudioManager.Instance.PlaySound("lose");
+        }
 
-        gameUI?.ShowLevelComplete(currentScore, finalStars);
-        level?.OnLevelComplete(currentScore, finalStars);
+        if (LevelResultUI.Instance)
+        {
+            if (win) LevelResultUI.Instance.ShowWin(currentScore, finalStars);
+            else     LevelResultUI.Instance.ShowLose(currentScore);
+        }
     }
 
     // ————————————————————— Fill / Gravity / Match —————————————————————
@@ -401,6 +443,7 @@ public class Grid : MonoBehaviour
                 moved = true;
             }
         }
+        
 
         return moved;
     }
@@ -546,6 +589,25 @@ public class Grid : MonoBehaviour
         GamePiece piece = pieces[x, y];
         if (piece == null) return;
 
+        if (AudioManager.Instance != null && awardResource)
+        {
+            switch (piece.Type)
+            {
+                case PieceType.EARTH:
+                    AudioManager.Instance.PlaySound("earth_clear");
+                    break;
+                case PieceType.GRASS:
+                    AudioManager.Instance.PlaySound("grass_clear");
+                    break;
+                case PieceType.WATER:
+                    AudioManager.Instance.PlaySound("water_clear");
+                    break;
+                case PieceType.SUN:
+                    AudioManager.Instance.PlaySound("sun_clear");
+                    break;
+            }
+        }
+
         // לא להעניק ריסורסים על מכשולים
         if (awardResource && bank != null &&
             piece.Type != PieceType.ICEOBS && piece.Type != PieceType.GRASSOBS)
@@ -573,6 +635,7 @@ public class Grid : MonoBehaviour
         if (a == null || b == null) return;
         if (!a.IsMoveable() || !b.IsMoveable()) return;
         if (!IsAdjacent(a, b)) return;
+
 
         int ax = a.X, ay = a.Y;
         int bx = b.X, by = b.Y;
@@ -618,7 +681,13 @@ public class Grid : MonoBehaviour
     private void ClearAndRefill()
     {
         if (ClearAllValidMatches())
+        {
+            //if (AudioManager.Instance != null)
+            //{
+             //   AudioManager.Instance.PlaySound("refill");
+            //}
             StartCoroutine(FillAndResolve());
+        }
     }
 
     private HashSet<GamePiece> FindAllMatchesOnBoard()
@@ -651,6 +720,13 @@ public class Grid : MonoBehaviour
         }
         else
         {
+                    // אחרי שאין עוד התאמות
+            if (GetObstacleCount() == 0)
+            {
+                GameOver();   // ניצחון
+                yield break;
+            }
+            
             yield return new WaitForSeconds(0.1f);
             CheckAndRefreshBoard();
         }
@@ -831,6 +907,8 @@ public class Grid : MonoBehaviour
     public void ShuffleBoard()
     {
         Debug.Log("Shuffling board…");
+        if (AudioManager.Instance != null)
+        AudioManager.Instance.PlaySound("refill");
 
         List<GamePiece> movable = new List<GamePiece>();
 
@@ -884,6 +962,8 @@ public class Grid : MonoBehaviour
     public void ManualRefreshBoard()
     {
         Debug.Log("Manual board refresh requested.");
+         if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySound("no_moves");
         ShuffleBoard();
     }
 
@@ -1099,45 +1179,46 @@ private bool CausesMatchAt(int x, int y, PieceType t)
     return false;
 }
 
-// פתיחת לוח עם "נפילה" מלמעלה וללא מאצ'ים או ניקוד/ניקוי אוטומטי
-private IEnumerator IntroPopulateBoardWithoutMatches()
-{
-    isIntroFilling = true;
-
-    var regularTypes = GetRegularTypes();
-
-    for (int y = 0; y < yDim; y++)
+    // פתיחת לוח עם "נפילה" מלמעלה וללא מאצ'ים או ניקוד/ניקוי אוטומטי
+    private IEnumerator IntroPopulateBoardWithoutMatches()
     {
-        for (int x = 0; x < xDim; x++)
+        isIntroFilling = true;
+
+        var regularTypes = GetRegularTypes();
+
+        for (int y = 0; y < yDim; y++)
         {
-            // בוחרים סוג שלא יוצר מאצ' מיידי
-            List<PieceType> candidates = new List<PieceType>(regularTypes);
-            // ערבוב קל כדי לגוון
-            for (int i = 0; i < candidates.Count; i++)
+            for (int x = 0; x < xDim; x++)
             {
-                int r = Random.Range(i, candidates.Count);
-                (candidates[i], candidates[r]) = (candidates[r], candidates[i]);
-            }
-
-            PieceType chosen = candidates[0];
-            foreach (var t in candidates)
-            {
-                if (!CausesMatchAt(x, y, t))
+                // בוחרים סוג שלא יוצר מאצ' מיידי
+                List<PieceType> candidates = new List<PieceType>(regularTypes);
+                // ערבוב קל כדי לגוון
+                for (int i = 0; i < candidates.Count; i++)
                 {
-                    chosen = t;
-                    break;
+                    int r = Random.Range(i, candidates.Count);
+                    (candidates[i], candidates[r]) = (candidates[r], candidates[i]);
                 }
+
+                PieceType chosen = candidates[0];
+                foreach (var t in candidates)
+                {
+                    if (!CausesMatchAt(x, y, t))
+                    {
+                        chosen = t;
+                        break;
+                    }
+                }
+
+                // יצירה מעל הלוח (y = -1) + אנימציית נפילה למיקום
+                SpawnNewPiece(x, y, chosen, spawnAbove: true);
             }
 
-            // יצירה מעל הלוח (y = -1) + אנימציית נפילה למיקום
-            SpawnNewPiece(x, y, chosen, spawnAbove: true);
+            // דיליי קטן בין שורות לנראות "גלישה"
+            yield return new WaitForSeconds(fillTime);
         }
 
-        // דיליי קטן בין שורות לנראות "גלישה"
-        yield return new WaitForSeconds(fillTime);
+        isIntroFilling = false;
     }
 
-    isIntroFilling = false;
-}
 
 }

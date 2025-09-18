@@ -152,12 +152,16 @@ public class GameUI : MonoBehaviour
     public void ShowStarEarnedMessage(int starCount)
     {
         Debug.Log($"⭐ Star {starCount} earned!");
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySound("star_appear");
         messageDisplay?.ShowStarMessage(starCount);
     }
 
     public void ShowNoMovesWarning()
     {
         Debug.Log("⚠️ Only a few moves left!");
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySound("time_warning");
         messageDisplay?.ShowWarningMessage();
     }
 
@@ -224,6 +228,8 @@ public class GameUI : MonoBehaviour
 
         if (curStars != lastStars)
         {
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound("star_appear");
             starsImage.sprite = starStates[curStars];
             if (curStars > lastStars)
             {
