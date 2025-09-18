@@ -31,3 +31,6 @@ Thumbs.db
 # JetBrains Rider
 .idea/
 UserSettings/Layouts/default-6000.dwlt
+/.utmp
+/Elementa_BackUpThisFolder_ButDontShipItWithYourGame
+/Elementa2D_BurstDebugInformation_DoNotShip
