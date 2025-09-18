@@ -20,6 +20,13 @@ public class LevelDirector : MonoBehaviour
             return;
         }
 
+        // Get saved stageIndex from PlayerPrefs if it exists
+        int savedStageIndex = PlayerPrefs.GetInt("current_level_stageIndex", stageIndex);
+        if (savedStageIndex > 0) {
+            stageIndex = savedStageIndex;
+            Debug.Log($"Loaded stage index from PlayerPrefs: {stageIndex}");
+        }
+
         var spec = useFixedSeed
             ? LevelGenerator.Generate(stageIndex, seed)
             : LevelGenerator.Generate(stageIndex);
